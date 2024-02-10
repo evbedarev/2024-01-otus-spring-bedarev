@@ -9,8 +9,7 @@ import ru.otus.hw.dao.dto.QuestionDto;
 import ru.otus.hw.domain.Question;
 import ru.otus.hw.exceptions.QuestionReadException;
 
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,12 +19,11 @@ public class CsvQuestionDao implements QuestionDao {
 
     @Override
     public List<Question> findAll() throws QuestionReadException {
-        Resource resource = new ClassPathResource(fileNameProvider.getTestFileName());
-        List<QuestionDto> quest = getQuestionsFromCsv(resource);
+        List<QuestionDto> quest = getQuestionsFromCsv(fileNameProvider.getTestFileName());
         List<Question> allQuestList = new ArrayList<>();
         for (QuestionDto qst : quest) {
             if (!checkCorrectLine(qst)) {
-               throw new QuestionReadException("Not correct question or too little answers", new RuntimeException());
+               throw new QuestionReadException("Not correct question or too little answers");
             }
             allQuestList.add(qst.toDomainObject());
         }
@@ -33,13 +31,13 @@ public class CsvQuestionDao implements QuestionDao {
         // https://opencsv.sourceforge.net/#collection_based_bean_fields_one_to_many_mappings
         // Использовать QuestionReadException
         // Про ресурсы: https://mkyong.com/java/java-read-a-file-from-resources-folder/
-
         return allQuestList;
     }
 
-    private List<QuestionDto> getQuestionsFromCsv(Resource resource) throws QuestionReadException {
-        try {
-            return (List<QuestionDto>) new CsvToBeanBuilder(new FileReader(resource.getFile()))
+    private List<QuestionDto> getQuestionsFromCsv(String filename) throws QuestionReadException {
+        try (InputStream inputStream = getFileFromResourceAsStream(filename);
+             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))){
+             return (List<QuestionDto>) new CsvToBeanBuilder(reader)
                     .withType(QuestionDto.class)
                     .withSkipLines(1)
                     .withSeparator(';')
@@ -50,7 +48,17 @@ public class CsvQuestionDao implements QuestionDao {
                     fileNameProvider.getTestFileName()), e);
         }
     }
-    private Boolean checkCorrectLine(QuestionDto qDto) {
+    private boolean checkCorrectLine(QuestionDto qDto) {
         return  ((qDto.getText().length() > 3) && (qDto.getAnswers().size() > 2));
+    }
+
+    private InputStream getFileFromResourceAsStream(String filename) throws QuestionReadException {
+        ClassLoader classLoader = getClass().getClassLoader();
+        InputStream inputStream = classLoader.getResourceAsStream(filename);
+        if (inputStream == null) {
+            throw new QuestionReadException(String.format("File {0} not found",filename), new RuntimeException());
+        } else {
+            return inputStream;
+        }
     }
 }

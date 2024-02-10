@@ -17,14 +17,20 @@ public class TestServiceImpl implements TestService {
     public void executeTest() {
         List<Question> questionList = questionDao.findAll();
         ioService.printFormattedLine("Please answer the questions below%n");
-        for (Question qst : questionList) {
-            ioService.printLine("Question: " + qst.getQuestion());
-            for (Answer answ : qst.answers()) {
-                ioService.printLine(qst.answers().indexOf(answ) + ". " + answ.text());
-            }
-            ioService.printLine("");
-        }
+        ioService.printFormattedLine(createQuestionString(questionList).toString());
         ioService.printLine("");
         // Получить вопросы из дао и вывести их с вариантами ответов
+    }
+
+    private StringBuilder createQuestionString(List <Question> qstList) {
+        StringBuilder questionSb = new StringBuilder();
+        for (Question qst : qstList) {
+            questionSb.append("Question: " + qst.text() + " %n");
+            for (Answer answ : qst.answers()) {
+                questionSb.append(qst.answers().indexOf(answ) + ". " + answ.text() + " %n");
+            }
+            questionSb.append(" %n");
+        }
+        return questionSb;
     }
 }
