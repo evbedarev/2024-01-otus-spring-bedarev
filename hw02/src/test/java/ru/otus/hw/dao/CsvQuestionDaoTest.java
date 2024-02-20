@@ -1,15 +1,16 @@
+package ru.otus.hw.dao;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import ru.otus.hw.config.AppProperties;
 import ru.otus.hw.config.TestFileNameProvider;
-import ru.otus.hw.dao.CsvQuestionDao;
 import ru.otus.hw.domain.Question;
 
 import java.util.List;
 
-public class IntegrationTestCsvRead {
+public class CsvQuestionDaoTest {
     private static final int Q_LIST_SIZE = 1;
     private static final int QUESTION_SIZE = 3;
     private static final String QUESTION = "Is there life on Mars?";
@@ -23,7 +24,7 @@ public class IntegrationTestCsvRead {
     }
 
     @Test
-    public void testCsvQuestionDao() {
+    public void checkThatQuestionReadFromFileIsCorrect() {
         CsvQuestionDao csvQuestionDao = new CsvQuestionDao(testFileNameProvider);
         List<Question> questionList = csvQuestionDao.findAll();
         Assertions.assertEquals(Q_LIST_SIZE, questionList.size());
