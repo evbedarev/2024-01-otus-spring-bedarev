@@ -38,7 +38,7 @@ public class CsvQuestionDao implements QuestionDao {
     private List<QuestionDto> getQuestionsFromCsv(String filename) throws QuestionReadException {
         try (InputStream inputStream = getFileFromResourceAsStream(filename);
              BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-            return new CsvToBeanBuilder(reader)
+            return new CsvToBeanBuilder<QuestionDto>(reader)
                     .withType(QuestionDto.class)
                     .withSkipLines(1)
                     .withSeparator(';')
