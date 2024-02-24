@@ -15,6 +15,7 @@ import java.util.List;
 public class TestServiceImpl implements TestService {
 
     private final IOService ioService;
+
     private final QuestionDao questionDao;
 
     @Override
@@ -23,13 +24,13 @@ public class TestServiceImpl implements TestService {
         TestResult testResult = new TestResult(student);
         ioService.printFormattedLine("Please answer the questions below%n");
         for (Question question : questionList) {
-            ioService.printFormattedLine(createQuestionString(question).toString());
+            ioService.printFormattedLine(createQuestionStringBuilder(question).toString());
             testResult.applyAnswer(question, getRightOrNotAnswer(question));
         }
         return testResult;
     }
 
-    private StringBuilder createQuestionString(Question qst) {
+    private StringBuilder createQuestionStringBuilder(Question qst) {
         StringBuilder questionSb = new StringBuilder();
         questionSb.append("Question: " + qst.text() + " %n");
         for (Answer answ : qst.answers()) {

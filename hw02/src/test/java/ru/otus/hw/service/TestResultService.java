@@ -15,7 +15,6 @@ import java.util.List;
 public class TestResultService {
     private IOService ioService;
     private TestConfig testConfig;
-    private TestResult testResult;
     private final Student student = new Student("TestFirstName", "TestLastName");
 
     @BeforeEach
@@ -25,8 +24,6 @@ public class TestResultService {
         Question question = new Question("test1", List.of(new Answer("answer1", true),
                 new Answer("answer2", false)));
         Mockito.when(testConfig.getRightAnswersCountToPass()).thenReturn(1);
-        testResult = new TestResult(student);
-        testResult.applyAnswer(question, true);
     }
 
     @Test
