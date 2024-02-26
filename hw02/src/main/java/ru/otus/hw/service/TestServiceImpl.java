@@ -24,19 +24,19 @@ public class TestServiceImpl implements TestService {
         TestResult testResult = new TestResult(student);
         ioService.printFormattedLine("Please answer the questions below%n");
         for (Question question : questionList) {
-            ioService.printFormattedLine(createQuestionStringBuilder(question).toString());
+            ioService.printFormattedLine(createQuestionStringBuilder(question));
             testResult.applyAnswer(question, getRightOrNotAnswer(question));
         }
         return testResult;
     }
 
-    private StringBuilder createQuestionStringBuilder(Question qst) {
+    private String createQuestionStringBuilder(Question qst) {
         StringBuilder questionSb = new StringBuilder();
         questionSb.append("Question: " + qst.text() + " %n");
         for (Answer answ : qst.answers()) {
             questionSb.append(qst.answers().indexOf(answ) + ". " + answ.text() + " %n");
         }
-        return questionSb;
+        return questionSb.toString();
     }
 
     private boolean getRightOrNotAnswer(Question question) {
