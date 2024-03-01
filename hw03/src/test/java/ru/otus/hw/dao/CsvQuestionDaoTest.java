@@ -18,19 +18,16 @@ public class CsvQuestionDaoTest {
     private static final String QUESTION = "Is there life on Mars?";
     private static final String CSV_PATH = "questions.csv";
     private TestFileNameProvider testFileNameProvider;
-    private LocalizationService localizationService;
 
     @BeforeEach
     public void init() {
         testFileNameProvider = Mockito.mock(AppProperties.class);
-        localizationService = Mockito.mock(LocalizationServiceImpl.class);
         Mockito.when(testFileNameProvider.getFilename()).thenReturn(CSV_PATH);
-        Mockito.when(localizationService.getLocaleFileName("questions.csv")).thenReturn("questions.csv");
     }
 
     @Test
     public void checkThatQuestionReadFromFileIsCorrect() {
-        CsvQuestionDao csvQuestionDao = new CsvQuestionDao(testFileNameProvider, localizationService);
+        CsvQuestionDao csvQuestionDao = new CsvQuestionDao(testFileNameProvider);
         List<Question> questionList = csvQuestionDao.findAll();
         Assertions.assertEquals(Q_LIST_SIZE, questionList.size());
         Assertions.assertTrue(questionList.get(0).text().equals(QUESTION));

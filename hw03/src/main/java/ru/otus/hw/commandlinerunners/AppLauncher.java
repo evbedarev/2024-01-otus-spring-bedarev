@@ -5,10 +5,10 @@ import org.springframework.stereotype.Component;
 import ru.otus.hw.service.TestRunnerService;
 
 @Component
-public class PreparationTest implements CommandLineRunner {
+public class AppLauncher implements CommandLineRunner {
     private final TestRunnerService testRunnerService;
 
-    public PreparationTest(TestRunnerService testRunnerService) {
+    public AppLauncher(TestRunnerService testRunnerService) {
         this.testRunnerService = testRunnerService;
     }
 

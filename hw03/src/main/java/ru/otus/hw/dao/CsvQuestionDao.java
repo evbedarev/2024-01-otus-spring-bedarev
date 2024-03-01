@@ -7,7 +7,6 @@ import ru.otus.hw.config.TestFileNameProvider;
 import ru.otus.hw.dao.dto.QuestionDto;
 import ru.otus.hw.domain.Question;
 import ru.otus.hw.exceptions.QuestionReadException;
-import ru.otus.hw.service.LocalizationService;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,8 +20,6 @@ import java.util.List;
 public class CsvQuestionDao implements QuestionDao {
 
     private final TestFileNameProvider fileNameProvider;
-
-    private final LocalizationService localizationService;
 
     @Override
     public List<Question> findAll() throws QuestionReadException {
@@ -42,7 +39,7 @@ public class CsvQuestionDao implements QuestionDao {
     }
 
     private List<QuestionDto> getQuestionsFromCsv(String filename) throws QuestionReadException {
-        try (InputStream inputStream = getFileFromResourceAsStream(localizationService.getLocaleFileName(filename));
+        try (InputStream inputStream = getFileFromResourceAsStream(fileNameProvider.getFilename());
              BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
             return new CsvToBeanBuilder<QuestionDto>(reader)
                     .withType(QuestionDto.class)
@@ -52,7 +49,7 @@ public class CsvQuestionDao implements QuestionDao {
                     .parse();
         } catch (IOException e) {
             throw new QuestionReadException(String.format("Problem read file question or File %s not found",
-                    localizationService.getLocaleFileName(filename)), e);
+                    fileNameProvider.getFilename()), e);
         }
     }
 
