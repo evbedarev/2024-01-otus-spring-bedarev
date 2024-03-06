@@ -1,0 +1,6 @@
+# Добавить сюда своих вопросов. Эту строку надо пропустить при настройке CsvToBean (withSkipLines)
+Есть ли жизнь на Марсе?;Ученым пока не известно%true|Конечно. Красные НЛО с Марса. Зеленые с Венеры%false|Конечно нет%false
+Как загрузать ресурсы внутри jar в Java?;ClassLoader#geResourceAsStream или ClassPathResource#getInputStream%true|ClassLoader#geResource#getFile + FileReader%false|Wingardium Leviosa%false
+Как правильно обрабатывать исключения?;@SneakyThrow%false|e.printStackTrace()%false|Пробрасывать обарачивая в бизнес-исключения(например, QuestionReadException)%true|Игнорировать исключения%false
+Что такое JDK?;Виртуальная машина JAVA%false|Набор для разработки JAVA%true|Среда выполнения JAVA%false
+Какой из методов относится к классу Объектов?;getAll()%false|close()%false|create()%false|toString()%true

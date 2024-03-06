@@ -1,0 +1,14 @@
+spring:
+  shell:
+    interactive:
+      enabled: false
+  messages:
+    basename: "i18n/appmessages"
+    encoding: "UTF-8"
+
+application:
+  locale: en
+  rightAnswers: 3
+  fileNameByLocaleTag:
+    ru: questions_ru.csv
+    en: questions_en.csv
