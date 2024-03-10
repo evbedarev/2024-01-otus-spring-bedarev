@@ -12,7 +12,7 @@ import ru.otus.hw.domain.Question;
 
 import java.util.List;
 
-@SpringBootTest
+@SpringBootTest(classes = CsvQuestionDao.class)
 public class CsvQuestionDaoTest {
 
     private static final int Q_LIST_SIZE = 1;

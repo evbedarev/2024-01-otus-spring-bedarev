@@ -7,12 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import ru.otus.hw.config.TestConfig;
-import ru.otus.hw.config.TestFileNameProvider;
 import ru.otus.hw.domain.Student;
 import ru.otus.hw.domain.TestResult;
 
-@SpringBootTest
+@SpringBootTest(classes = ResultServiceImpl.class)
 public class TestResultService {
+    private static final String STUDENT_FULL_NAME = "TestFirstName TestLastName";
 
     @MockBean
     private IOService ioService;
@@ -24,28 +24,28 @@ public class TestResultService {
     private LocalizationService localizationService;
 
     @MockBean
-    private TestFileNameProvider testFileNameProvider;
-
-    @Autowired
     private Student student;
 
-    @Autowired
-    ResultService resultService;
+    @MockBean
+    private TestResult testResult;
 
     @Autowired
-    TestResult testResult;
+    private ResultService resultService;
+
 
     @BeforeEach
     public void init() {
+        Mockito.when(student.getFullName()).thenReturn(STUDENT_FULL_NAME);
         Mockito.when(testConfig.getRightAnswers()).thenReturn(1);
-        Mockito.when(localizationService.getMessage("test.student", student.getFullName()))
-                .thenReturn(String.format("Student: %s", student.getFullName()));
+        Mockito.when(testResult.getStudent()).thenReturn(student);
+        Mockito.when(localizationService.getMessage("test.student", STUDENT_FULL_NAME)).
+                thenReturn(String.format("Student: %s", STUDENT_FULL_NAME));
     }
 
     @Test
     public void shouldInvokeIoServiceMethodsWithExpectedArgumentDuringTestExecution() {
-        resultService.showResult(testResult);
-        Mockito.verify(ioService, Mockito.times(1))
-                .printFormattedLine(String.format("Student: %s", student.getFullName()));
+            resultService.showResult(testResult);
+            Mockito.verify(ioService, Mockito.times(1))
+                    .printFormattedLine(String.format("Student: %s", student.getFullName()));
     }
 }

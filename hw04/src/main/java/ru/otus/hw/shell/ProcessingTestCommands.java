@@ -9,16 +9,16 @@ import org.springframework.shell.standard.ShellOption;
 import ru.otus.hw.security.LoginContext;
 import ru.otus.hw.service.TestRunnerService;
 
-@ShellComponent(value = "Application Event Commands")
+@ShellComponent(value = "Processing Test Commands")
 @RequiredArgsConstructor
-public class ApplicationEventCommands {
+public class ProcessingTestCommands {
 
     private final TestRunnerService testRunnerService;
 
     private final LoginContext loginContext;
 
     @ShellMethod(value = "Login command", key = {"l","login"})
-    public String login(@ShellOption(defaultValue = "Anonimous") String userName) {
+    public String login(@ShellOption(defaultValue = "Anonymous") String userName) {
         loginContext.login(userName);
         return String.format("Добро пожаловать: %s!", userName);
     }

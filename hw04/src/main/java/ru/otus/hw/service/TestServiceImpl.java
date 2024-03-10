@@ -36,8 +36,9 @@ public class TestServiceImpl implements TestService {
     private String createQuestionStringBuilder(Question qst) {
         StringBuilder questionSb = new StringBuilder();
         questionSb.append(localizationService.getMessage("test.question",qst.text()));
+        int count = 0;
         for (Answer answ : qst.answers()) {
-            questionSb.append(qst.answers().indexOf(answ) + ". " + answ.text() + " %n");
+            questionSb.append(count++ + ". " + answ.text() + " %n");
         }
         return questionSb.toString();
     }

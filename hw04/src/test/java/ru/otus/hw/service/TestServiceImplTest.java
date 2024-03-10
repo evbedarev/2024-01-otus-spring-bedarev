@@ -6,7 +6,6 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import ru.otus.hw.dao.CsvQuestionDao;
 import ru.otus.hw.dao.QuestionDao;
 import ru.otus.hw.domain.Answer;
 import ru.otus.hw.domain.Question;
@@ -14,7 +13,7 @@ import ru.otus.hw.domain.Student;
 
 import java.util.List;
 
-@SpringBootTest
+@SpringBootTest(classes = TestServiceImpl.class)
 public class TestServiceImplTest {
 
     private static final String QUESTION_1_STRING = "Question: test1 %n0. answer1 %n1. answer2 %n";
@@ -28,17 +27,24 @@ public class TestServiceImplTest {
     @MockBean
     private LocalizationService localizationService;
 
-    @Autowired
+    @MockBean
     private Student student;
+
+    @MockBean
+    private Question question;
+
+    @MockBean
+    private Answer answer;
 
     @Autowired
     private TestService testService;
 
-    @Autowired
-    private Question question;
-
     @BeforeEach
     public void init() {
+        Mockito.when(answer.text()).thenReturn("answer1").thenReturn("answer2");
+        Mockito.when(answer.isCorrect()).thenReturn(true).thenReturn(false);
+        Mockito.when(question.text()).thenReturn("test1");
+        Mockito.when(question.answers()).thenReturn(List.of(answer,answer));
         Mockito.when(questionDao.findAll()).thenReturn(List.of(question));
         Mockito.when(localizationService.getMessage("test.question", "test1"))
                 .thenReturn("Question: test1 %n");
