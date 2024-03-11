@@ -23,29 +23,29 @@ public class TestResultService {
     @MockBean
     private LocalizationService localizationService;
 
-    @MockBean
-    private Student student;
-
-    @MockBean
-    private TestResult testResult;
-
     @Autowired
     private ResultService resultService;
 
 
     @BeforeEach
     public void init() {
-        Mockito.when(student.getFullName()).thenReturn(STUDENT_FULL_NAME);
         Mockito.when(testConfig.getRightAnswers()).thenReturn(1);
-        Mockito.when(testResult.getStudent()).thenReturn(student);
         Mockito.when(localizationService.getMessage("test.student", STUDENT_FULL_NAME)).
                 thenReturn(String.format("Student: %s", STUDENT_FULL_NAME));
     }
 
     @Test
     public void shouldInvokeIoServiceMethodsWithExpectedArgumentDuringTestExecution() {
-            resultService.showResult(testResult);
-            Mockito.verify(ioService, Mockito.times(1))
-                    .printFormattedLine(String.format("Student: %s", student.getFullName()));
+        resultService.showResult(getTestResult());
+        Mockito.verify(ioService, Mockito.times(1))
+                .printFormattedLine(String.format("Student: %s", STUDENT_FULL_NAME));
+    }
+
+
+    private TestResult getTestResult ()  {
+        TestResult tr = Mockito.mock(TestResult.class);
+        Mockito.when(tr.getStudent()).thenReturn(new Student(STUDENT_FULL_NAME.split(" ")[0],
+                STUDENT_FULL_NAME.split(" ")[1] ));
+        return tr;
     }
 }
