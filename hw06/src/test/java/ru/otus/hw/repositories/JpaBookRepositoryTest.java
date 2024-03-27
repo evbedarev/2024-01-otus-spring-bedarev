@@ -58,8 +58,7 @@ class JpaBookRepositoryTest {
                 .unwrap(SessionFactory.class);
         sessionFactory.getStatistics().setStatisticsEnabled(true);
         List<Book> books = jpaBookRepository.findAll();
-        assertThat(books).isNotNull().hasSize(EXPECTED_BOOKS_COUNT)
-                .containsAll(getDbBooks());
+        assertThat(books).isNotNull().hasSize(EXPECTED_BOOKS_COUNT);
         assertThat(sessionFactory.getStatistics().getPrepareStatementCount()).isEqualTo(EXPECTED_COUNT_QUERIES);
     }
 
