@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Comment;
 
 import java.util.List;
@@ -49,30 +50,30 @@ public class JpaCommentsRepositoryTest {
     void shouldReturnCorrectCommentById() {
         Optional<Comment> optionalComment = jpaCommentRepository.findById(FIRST_COMMENT_ID);
         assertThat(optionalComment).isPresent().get()
-                .matches(s -> s.getText().equals(FIRST_COMM_FIRST_BOOK) && s.getBookId() == FIRST_BOOK_ID);
+                .matches(s -> s.getText().equals(FIRST_COMM_FIRST_BOOK) && s.getBook().getId() == FIRST_BOOK_ID);
     }
 
     @DisplayName("Должен обновлять коментарий по id")
     @Test
     void shouldUpdateCommentById() {
-        Comment commentForUpdate = new Comment(FIRST_COMMENT_ID,SECOND_COMM_FIRST_BOOK,FIRST_BOOK_ID);
+        Comment commentForUpdate = new Comment(FIRST_COMMENT_ID,SECOND_COMM_FIRST_BOOK, getFirstBook());
         jpaCommentRepository.save(commentForUpdate);
         Optional<Comment> commentAfterUpdate = jpaCommentRepository.findById(FIRST_COMMENT_ID);
         assertThat(commentAfterUpdate).isPresent().get()
                 .matches(s -> s.getId() == FIRST_COMMENT_ID &&
                         s.getText().equals(SECOND_COMM_FIRST_BOOK) &&
-                        s.getBookId() == FIRST_BOOK_ID);
+                        s.getBook().getId() == FIRST_BOOK_ID);
 
     }
 
     @DisplayName("Должен вставлять новый коментарий")
     @Test
     void shouldInsertNewComment() {
-        Comment commentForInsert = new Comment(0,NEW_COMMENT_STRING,FIRST_BOOK_ID);
+        Comment commentForInsert = new Comment(0,NEW_COMMENT_STRING,getFirstBook());
         jpaCommentRepository.save(commentForInsert);
         Optional<Comment> newComment = jpaCommentRepository.findById(NEW_COMMENT_ID);
         assertThat(newComment).isPresent().get()
-                .matches(s -> s.getBookId() == FIRST_BOOK_ID &&
+                .matches(s -> s.getBook().getId() == FIRST_BOOK_ID &&
                         s.getText().equals(NEW_COMMENT_STRING));
     }
 
@@ -82,5 +83,9 @@ public class JpaCommentsRepositoryTest {
         jpaCommentRepository.deleteById(FIRST_COMMENT_ID);
         Optional<Comment> comment = jpaCommentRepository.findById(FIRST_COMMENT_ID);
         assertThat(comment).isNotPresent();
+    }
+
+    Book getFirstBook() {
+        return new Book(1L,"title",null, null);
     }
 }

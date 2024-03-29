@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Book;
-import ru.otus.hw.models.Comment;
 import ru.otus.hw.repositories.AuthorRepository;
 import ru.otus.hw.repositories.BookRepository;
 import ru.otus.hw.repositories.CommentRepository;
@@ -50,6 +49,8 @@ public class BookServiceImpl implements BookService {
     @Transactional
     @Override
     public void deleteById(long id) {
+        bookRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("Book with id %d not found".formatted(id)));
         bookRepository.deleteById(id);
     }
 
@@ -59,8 +60,7 @@ public class BookServiceImpl implements BookService {
                 .orElseThrow(() -> new EntityNotFoundException("Author with id %d not found".formatted(authorId)));
         var genre = genreRepository.findById(genreId)
                 .orElseThrow(() -> new EntityNotFoundException("Genre with id %d not found".formatted(genreId)));
-        List<Comment> comments = commentRepository.getAllCommentsByBookId(id);
-        var book = new Book(id, title, author, genre, comments);
+        var book = new Book(id, title, author, genre);
         return bookRepository.save(book);
     }
 

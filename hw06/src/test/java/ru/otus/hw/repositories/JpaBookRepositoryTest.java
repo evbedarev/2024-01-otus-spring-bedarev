@@ -65,27 +65,29 @@ class JpaBookRepositoryTest {
     @DisplayName("должен сохранять новую книгу")
     @Test
     void shouldSaveNewBook() {
-        Book expectedBook = new Book(
-                NEW_ID_FOR_INSERT_BOOK,
-                NEW_BOOK_TITLE,
-                getAuthor(NEW_ID_FOR_INSERT_BOOK),
-                getGenre(NEW_ID_FOR_INSERT_BOOK),
-                getSingleComment(NEW_ID_FOR_INSERT_BOOK));
+        Author author = getAuthor(NEW_ID_FOR_INSERT_BOOK - 1);
+        Genre genre = getGenre(NEW_ID_FOR_INSERT_BOOK - 1);
+        Book expectedBook = new Book(NEW_ID_FOR_INSERT_BOOK, NEW_BOOK_TITLE, author, genre);
         jpaBookRepository.save(expectedBook);
-        Optional<Book> actualBook = jpaBookRepository.findById(4);
-        assertThat(actualBook).isPresent().get().usingRecursiveComparison()
-                .isEqualTo(expectedBook);
+        Optional<Book> actualBook = jpaBookRepository.findById(NEW_ID_FOR_INSERT_BOOK);
+        assertThat(actualBook).isPresent().get()
+                .matches(s -> s.getTitle().equals(NEW_BOOK_TITLE))
+                .matches(s -> s.getAuthor().getFullName().equals(author.getFullName()))
+                .matches(s -> s.getGenre().getName().equals(genre.getName()));
     }
 
     @DisplayName("должен сохранять измененную книгу")
     @Test
     void shouldSaveUpdatedBook() {
-        Book expectedBook = new Book(FIRST_BOOK_ID, "new title",
-                getAuthor(FIRST_BOOK_ID + 1),getGenre(FIRST_BOOK_ID + 1), getSingleComment(FIRST_BOOK_ID + 1));
+        Author author = getAuthor(FIRST_BOOK_ID + 1);
+        Genre genre = getGenre(FIRST_BOOK_ID + 1);
+        Book expectedBook = new Book(FIRST_BOOK_ID, NEW_BOOK_TITLE, author, genre);
         jpaBookRepository.save(expectedBook);
         Optional<Book> actualBook = jpaBookRepository.findById(FIRST_BOOK_ID);
         assertThat(actualBook).isPresent().get()
-                .usingRecursiveComparison().isEqualTo(expectedBook);
+                .matches(s -> s.getTitle().equals(NEW_BOOK_TITLE))
+                .matches(s -> s.getAuthor().getFullName().equals(author.getFullName()))
+                .matches(s -> s.getGenre().getName().equals(genre.getName()));
 
     }
 
@@ -113,8 +115,7 @@ class JpaBookRepositoryTest {
         return IntStream.range(1, 4).boxed()
                 .map(id -> new Book(id, "BookTitle_" + id,
                         dbAuthors.get(id - 1),
-                        dbGenres.get(id - 1),
-                        getSingleComment(id - 1)))
+                        dbGenres.get(id - 1)))
                 .toList();
     }
     private static List<Book> getDbBooks() {
@@ -131,9 +132,4 @@ class JpaBookRepositoryTest {
     private static Genre getGenre(int id) {
         return new Genre(id, "Genre_" + id);
     }
-    private static List<Comment> getSingleComment(int id) {
-        return Arrays.asList(new Comment(id, "Comment_" + id, id));
-    }
-
-
 }

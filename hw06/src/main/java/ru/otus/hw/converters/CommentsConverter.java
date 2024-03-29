@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public class CommentsConverter {
     public String commentToString(Comment comment) {
         return "Id: %d, Text: %s BookId: %s".formatted(comment.getId(), comment.getText(),
-                comment.getBookId());
+                comment.getBook().getId());
     }
 
     public String commentsToString(List<Comment> comments) {
