@@ -1,6 +1,5 @@
 package ru.otus.hw.repositories;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,11 +25,7 @@ public class JpaAuthorRepositoryTest {
     private final static int FIRST_AUTHOR_ID = 1;
 
     @Autowired
-    JpaAuthorRepository jpaRepository;
-
-    @BeforeEach
-    void init() {
-    }
+    private JpaAuthorRepository jpaRepository;
 
     @DisplayName("Должен загружать список всех авторов")
     @Test
@@ -38,13 +33,13 @@ public class JpaAuthorRepositoryTest {
         List<Author> authors = jpaRepository.findAll();
         assertThat(authors).isNotNull().hasSize(EXPECTED_COUNT_AUTHORS)
                 .allMatch(s -> !s.getFullName().equals(""))
-            .anyMatch(s -> s.getFullName().equals("Author_2") && s.getId() == 2);
-}
+                .anyMatch(s -> s.getFullName().equals("Author_2") && s.getId() == 2);
+    }
 
-@DisplayName("Должен загружать автора по id")
-@ParameterizedTest
-@MethodSource("getAuthors")
-void shouldReturnCorrectAuthorById() {
+    @DisplayName("Должен загружать автора по id")
+    @ParameterizedTest
+    @MethodSource("getAuthors")
+    void shouldReturnCorrectAuthorById() {
         Optional<Author> optionalAuthor = jpaRepository.findById(FIRST_AUTHOR_ID);
         Author expectedAuthor = getAuthor(FIRST_AUTHOR_ID);
         assertThat(optionalAuthor).isPresent().get().usingRecursiveComparison()

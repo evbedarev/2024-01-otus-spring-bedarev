@@ -2,11 +2,9 @@ package ru.otus.hw.models;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -20,4 +18,12 @@ public class Author {
 
     @Column(name = "full_name")
     private String fullName;
+
+    public long getId() {
+        return id;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
 }

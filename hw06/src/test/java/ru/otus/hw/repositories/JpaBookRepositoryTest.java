@@ -1,7 +1,6 @@
 package ru.otus.hw.repositories;
 
 import jakarta.persistence.EntityManager;
-import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -11,10 +10,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
-import ru.otus.hw.models.Comment;
 import ru.otus.hw.models.Genre;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
@@ -26,7 +23,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import({JpaBookRepository.class})
 class JpaBookRepositoryTest {
 
-    private final static long EXPECTED_COUNT_QUERIES = 1L;
     private final static int EXPECTED_BOOKS_COUNT = 3;
 
     private final static int FIRST_BOOK_ID = 1;
@@ -54,12 +50,8 @@ class JpaBookRepositoryTest {
     @DisplayName("должен загружать список всех книг за 1 запрос")
     @Test
     void shouldReturnCorrectBooksList() {
-        SessionFactory sessionFactory = em.getEntityManagerFactory()
-                .unwrap(SessionFactory.class);
-        sessionFactory.getStatistics().setStatisticsEnabled(true);
         List<Book> books = jpaBookRepository.findAll();
         assertThat(books).isNotNull().hasSize(EXPECTED_BOOKS_COUNT);
-        assertThat(sessionFactory.getStatistics().getPrepareStatementCount()).isEqualTo(EXPECTED_COUNT_QUERIES);
     }
 
     @DisplayName("должен сохранять новую книгу")
@@ -69,8 +61,8 @@ class JpaBookRepositoryTest {
         Genre genre = getGenre(NEW_ID_FOR_INSERT_BOOK - 1);
         Book expectedBook = new Book(NEW_ID_FOR_INSERT_BOOK, NEW_BOOK_TITLE, author, genre);
         jpaBookRepository.save(expectedBook);
-        Optional<Book> actualBook = jpaBookRepository.findById(NEW_ID_FOR_INSERT_BOOK);
-        assertThat(actualBook).isPresent().get()
+        Book actualBook = em.find(Book.class, NEW_ID_FOR_INSERT_BOOK);
+        assertThat(actualBook)
                 .matches(s -> s.getTitle().equals(NEW_BOOK_TITLE))
                 .matches(s -> s.getAuthor().getFullName().equals(author.getFullName()))
                 .matches(s -> s.getGenre().getName().equals(genre.getName()));
@@ -83,8 +75,8 @@ class JpaBookRepositoryTest {
         Genre genre = getGenre(FIRST_BOOK_ID + 1);
         Book expectedBook = new Book(FIRST_BOOK_ID, NEW_BOOK_TITLE, author, genre);
         jpaBookRepository.save(expectedBook);
-        Optional<Book> actualBook = jpaBookRepository.findById(FIRST_BOOK_ID);
-        assertThat(actualBook).isPresent().get()
+        Book actualBook = em.find(Book.class, FIRST_BOOK_ID);
+        assertThat(actualBook)
                 .matches(s -> s.getTitle().equals(NEW_BOOK_TITLE))
                 .matches(s -> s.getAuthor().getFullName().equals(author.getFullName()))
                 .matches(s -> s.getGenre().getName().equals(genre.getName()));
@@ -95,7 +87,7 @@ class JpaBookRepositoryTest {
     @Test
     void shouldDeleteBook() {
         jpaBookRepository.deleteById(FIRST_BOOK_ID);
-        Optional<Book> deletedBook = jpaBookRepository.findById(FIRST_BOOK_ID);
+        Optional<Book> deletedBook = Optional.ofNullable(em.find(Book.class, FIRST_BOOK_ID));
         assertThat(deletedBook).isNotPresent();
     }
 

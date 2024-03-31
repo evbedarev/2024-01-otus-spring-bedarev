@@ -2,10 +2,8 @@ package ru.otus.hw.models;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -24,4 +22,15 @@ public class Comment {
     @JoinColumn(name = "book_id")
     private Book book;
 
+    public long getId() {
+        return id;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public Book getBook() {
+        return book;
+    }
 }

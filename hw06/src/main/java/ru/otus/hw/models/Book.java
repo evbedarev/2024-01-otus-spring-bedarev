@@ -2,10 +2,8 @@ package ru.otus.hw.models;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -29,4 +27,20 @@ public class Book {
     @ManyToOne(targetEntity = Genre.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "genre_id", unique = false, nullable = true)
     private Genre genre;
+
+    public long getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public Author getAuthor() {
+        return author;
+    }
+
+    public Genre getGenre() {
+        return genre;
+    }
 }

@@ -1,5 +1,6 @@
 package ru.otus.hw.repositories;
 
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,10 @@ public class JpaCommentsRepositoryTest {
     private static final int NEW_COMMENT_ID = 5;
 
     @Autowired
-    JpaCommentRepository jpaCommentRepository;
+    private JpaCommentRepository jpaCommentRepository;
+
+    @Autowired
+    private EntityManager em;
 
     @DisplayName("Должен загружать список всех коментариев к книге")
     @Test
@@ -56,10 +60,10 @@ public class JpaCommentsRepositoryTest {
     @DisplayName("Должен обновлять коментарий по id")
     @Test
     void shouldUpdateCommentById() {
-        Comment commentForUpdate = new Comment(FIRST_COMMENT_ID,SECOND_COMM_FIRST_BOOK, getFirstBook());
+        Comment commentForUpdate = new Comment(FIRST_COMMENT_ID, SECOND_COMM_FIRST_BOOK, getFirstBook());
         jpaCommentRepository.save(commentForUpdate);
-        Optional<Comment> commentAfterUpdate = jpaCommentRepository.findById(FIRST_COMMENT_ID);
-        assertThat(commentAfterUpdate).isPresent().get()
+        Comment commentAfterUpdate = em.find(Comment.class, FIRST_COMMENT_ID);
+        assertThat(commentAfterUpdate)
                 .matches(s -> s.getId() == FIRST_COMMENT_ID &&
                         s.getText().equals(SECOND_COMM_FIRST_BOOK) &&
                         s.getBook().getId() == FIRST_BOOK_ID);
@@ -69,23 +73,23 @@ public class JpaCommentsRepositoryTest {
     @DisplayName("Должен вставлять новый коментарий")
     @Test
     void shouldInsertNewComment() {
-        Comment commentForInsert = new Comment(0,NEW_COMMENT_STRING,getFirstBook());
+        Comment commentForInsert = new Comment(0, NEW_COMMENT_STRING, getFirstBook());
         jpaCommentRepository.save(commentForInsert);
-        Optional<Comment> newComment = jpaCommentRepository.findById(NEW_COMMENT_ID);
-        assertThat(newComment).isPresent().get()
+        Comment newComment = em.find(Comment.class, NEW_COMMENT_ID);
+        assertThat(newComment)
                 .matches(s -> s.getBook().getId() == FIRST_BOOK_ID &&
                         s.getText().equals(NEW_COMMENT_STRING));
     }
 
     @DisplayName("Должен удалять коментарий по id")
     @Test
-    void shouldDeleteCommentById(){
+    void shouldDeleteCommentById() {
         jpaCommentRepository.deleteById(FIRST_COMMENT_ID);
-        Optional<Comment> comment = jpaCommentRepository.findById(FIRST_COMMENT_ID);
+        Optional<Comment> comment = Optional.ofNullable(em.find(Comment.class, FIRST_COMMENT_ID));
         assertThat(comment).isNotPresent();
     }
 
     Book getFirstBook() {
-        return new Book(1L,"title",null, null);
+        return new Book(1L, "title", null, null);
     }
 }
