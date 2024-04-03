@@ -2,6 +2,7 @@ package ru.otus.hw.models;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
@@ -13,16 +14,10 @@ public class Genre {
     @Id
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Getter
     private long id;
 
     @Column(name = "name",nullable = false, unique = true)
+    @Getter
     private String name;
-
-    public long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
 }
