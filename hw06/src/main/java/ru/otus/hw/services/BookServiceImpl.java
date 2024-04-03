@@ -54,8 +54,7 @@ public class BookServiceImpl implements BookService {
         bookRepository.deleteById(id);
     }
 
-    @Transactional
-    public Book save(long id, String title, long authorId, long genreId) {
+    private Book save(long id, String title, long authorId, long genreId) {
         var author = authorRepository.findById(authorId)
                 .orElseThrow(() -> new EntityNotFoundException("Author with id %d not found".formatted(authorId)));
         var genre = genreRepository.findById(genreId)
