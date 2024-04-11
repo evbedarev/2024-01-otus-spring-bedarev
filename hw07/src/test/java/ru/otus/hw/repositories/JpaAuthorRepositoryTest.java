@@ -6,7 +6,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
 import ru.otus.hw.models.Author;
 
 import java.util.List;
@@ -21,7 +20,7 @@ public class JpaAuthorRepositoryTest {
 
     private final static int EXPECTED_COUNT_AUTHORS = 3;
 
-    private final static int FIRST_AUTHOR_ID = 1;
+    private final static long FIRST_AUTHOR_ID = 1;
 
     @Autowired
     private AuthorRepository jpaRepository;
@@ -52,7 +51,7 @@ public class JpaAuthorRepositoryTest {
                 .map(JpaAuthorRepositoryTest::getAuthor).toList();
     }
 
-    private static Author getAuthor(int id) {
+    private static Author getAuthor(long id) {
         return new Author(id, "Author_" + id);
     }
 }
