@@ -27,7 +27,7 @@ public class CommentServiceImpl implements CommentService {
     public List<Comment> findAllCommentsByBookId(String bookId) {
         List<Comment> comments = commentRepository.getAllCommentsByBookId(bookId);
         if (comments.isEmpty()) {
-            throw new EntityNotFoundException("Book with id=%s not found".formatted(bookId));
+            throw new EntityNotFoundException("Comments for book with id=%s not found".formatted(bookId));
         }
         return comments;
     }
@@ -46,29 +46,48 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     @Override
     public Comment update(String id, String text) {
-        Optional<Comment> comment = findById(id);
-        return save(id, text, comment.get().getBook().getId());
+        return save(id, text, "");
     }
 
     @Transactional
     @Override
     public void deleteById(String id) {
-        commentRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Comment with id %s not found".formatted(id)));
-        commentRepository.deleteById(id);
+        if (commentRepository.existsById(id)) {
+            deleteCommentFromBook(id);
+            commentRepository.deleteById(id);
+        } else  {
+            new EntityNotFoundException("Comment with id %s not found".formatted(id));
+        }
     }
 
-    @Transactional
-    public Comment save(String id, String text, String bookId) {
-        Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new EntityNotFoundException("Book with id %s not found".formatted(bookId)));
+    private Comment save(String id, String text, String bookId) {
+        if (id.equals("")) {
+            Book book = bookRepository.findById(bookId)
+                    .orElseThrow(() -> new EntityNotFoundException("Book with id %s not found".formatted(bookId)));
+            Comment comment = commentRepository.save(new Comment(text, book));
+            bindCommentWithBook(book, comment);
+            return comment;
+        }
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Comment with id %s not found".formatted(id)));
-        if (id.equals("")) {
-            return commentRepository.save(new Comment(text, book));
-        }
         comment.setText(text);
-        comment.setBook(book);
         return commentRepository.save(comment);
+    }
+
+    private void bindCommentWithBook(Book book, Comment comment) {
+        List<String> bookComments = book.getCommentsIds();
+        bookComments.add(comment.getId());
+        book.setComments(bookComments);
+        bookRepository.save(book);
+    }
+
+    private void deleteCommentFromBook(String commentId) {
+        Book book = findById(commentId)
+                .orElseThrow(() -> new EntityNotFoundException("book not found"))
+                .getBook();
+        List<String> comments = book.getCommentsIds().stream()
+                .filter(c -> !c.equals(commentId)).toList();
+        book.setComments(comments);
+        bookRepository.save(book);
     }
 }

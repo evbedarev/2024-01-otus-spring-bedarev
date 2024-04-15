@@ -15,4 +15,6 @@ public interface BookService {
     Book update(String id, String title, String authorId, String genreId);
 
     void deleteById(String id);
+
+    //void deleteCommentFromBook(String bookId, String commentId);
 }

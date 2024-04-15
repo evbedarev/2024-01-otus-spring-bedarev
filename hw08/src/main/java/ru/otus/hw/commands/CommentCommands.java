@@ -52,6 +52,6 @@ public class CommentCommands {
     @ShellMethod(value = "Delete comment by id", key = "dcbid")
     public String deleteCommentById(String id) {
         commentService.deleteById(id);
-        return "Comment with %d deleted".formatted(id);
+        return "Comment with %s deleted".formatted(id);
     }
 }

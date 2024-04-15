@@ -4,6 +4,10 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
+import java.util.List;
+
+
 @Document(collection = "books")
 public class Book {
     @Id
@@ -16,6 +20,8 @@ public class Book {
 
     @DBRef
     private Genre genre;
+
+    private List<String> commentsIds = new ArrayList<>();
 
     public Book () {
     }
@@ -63,5 +69,13 @@ public class Book {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public List<String> getCommentsIds() {
+        return this.commentsIds;
+    }
+
+    public void setComments(List<String> commentsIds) {
+        this.commentsIds = commentsIds;
     }
 }

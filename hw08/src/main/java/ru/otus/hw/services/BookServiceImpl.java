@@ -57,12 +57,15 @@ public class BookServiceImpl implements BookService {
     @Transactional
     @Override
     public void deleteById(String id) {
-        bookRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Book with id %d not found".formatted(id)));
-        bookRepository.deleteById(id);
+        if (bookRepository.existsById(id)) {
+            removeDepententComments(bookRepository.findById(id).get().getCommentsIds());
+            bookRepository.deleteById(id);
+        } else {
+            throw new EntityNotFoundException("Book with id %d not found".formatted(id));
+        }
     }
 
-    public Book save(String id, String title, String authorId, String genreId) {
+    private Book save(String id, String title, String authorId, String genreId) {
         var author = authorRepository.findById(authorId)
                 .orElseThrow(() -> new EntityNotFoundException("Author with id %s not found".formatted(authorId)));
         var genre = genreRepository.findById(genreId)
@@ -78,4 +81,7 @@ public class BookServiceImpl implements BookService {
         return bookRepository.save(book);
     }
 
+    private void removeDepententComments(List<String> commentsIds) {
+            commentsIds.stream().forEach(ids -> commentRepository.deleteById(ids));
+    }
 }
