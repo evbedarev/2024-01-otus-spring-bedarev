@@ -42,8 +42,6 @@ public class JpaAuthorRepositoryTest {
         Author expectedAuthor = getAuthor(FIRST_AUTHOR_ID);
         assertThat(optionalAuthor).isPresent().get().usingRecursiveComparison()
                 .isEqualTo(expectedAuthor);
-
-
     }
 
     private static List<Author> getAuthors() {

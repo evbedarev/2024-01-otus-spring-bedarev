@@ -24,7 +24,7 @@ public class CommentServiceImpl implements CommentService {
     public List<Comment> findAllCommentsByBookId(long bookId) {
         List<Comment> comments = commentRepository.getAllCommentsByBookId(bookId);
         if (comments.isEmpty()) {
-            throw new EntityNotFoundException("Book with id=%d not found".formatted(bookId));
+            throw new EntityNotFoundException("Comments for book with id=%d not found".formatted(bookId));
         }
         return comments;
     }
@@ -51,6 +51,8 @@ public class CommentServiceImpl implements CommentService {
     public void deleteById(long id) {
         if (commentRepository.existsById(id)) {
             commentRepository.deleteById(id);
+        } else {
+            throw new EntityNotFoundException("Comment with id=%d not found".formatted(id));
         }
     }
 
