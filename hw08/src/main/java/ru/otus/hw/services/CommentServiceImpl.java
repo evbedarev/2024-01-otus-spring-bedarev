@@ -53,7 +53,6 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void deleteById(String id) {
         if (commentRepository.existsById(id)) {
-            deleteCommentFromBook(id);
             commentRepository.deleteById(id);
         } else  {
             new EntityNotFoundException("Comment with id %s not found".formatted(id));
@@ -64,30 +63,11 @@ public class CommentServiceImpl implements CommentService {
         if (id.equals("")) {
             Book book = bookRepository.findById(bookId)
                     .orElseThrow(() -> new EntityNotFoundException("Book with id %s not found".formatted(bookId)));
-            Comment comment = commentRepository.save(new Comment(text, book));
-            bindCommentWithBook(book, comment);
-            return comment;
+            return commentRepository.save(new Comment(text, book));
         }
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Comment with id %s not found".formatted(id)));
         comment.setText(text);
         return commentRepository.save(comment);
-    }
-
-    private void bindCommentWithBook(Book book, Comment comment) {
-        List<String> bookComments = book.getCommentsIds();
-        bookComments.add(comment.getId());
-        book.setComments(bookComments);
-        bookRepository.save(book);
-    }
-
-    private void deleteCommentFromBook(String commentId) {
-        Book book = findById(commentId)
-                .orElseThrow(() -> new EntityNotFoundException("book not found"))
-                .getBook();
-        List<String> comments = book.getCommentsIds().stream()
-                .filter(c -> !c.equals(commentId)).toList();
-        book.setComments(comments);
-        bookRepository.save(book);
     }
 }

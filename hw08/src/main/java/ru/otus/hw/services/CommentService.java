@@ -16,6 +16,4 @@ public interface CommentService {
     Comment update(String id, String text);
 
     void deleteById(String id);
-
-    //void deleteCommentFromBook(String bookId, String commentId);
 }

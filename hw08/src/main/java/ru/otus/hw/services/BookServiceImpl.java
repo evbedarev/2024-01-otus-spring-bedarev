@@ -58,7 +58,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public void deleteById(String id) {
         if (bookRepository.existsById(id)) {
-            removeDepententComments(bookRepository.findById(id).get().getCommentsIds());
+            commentRepository.deleteAllCommentsByBookId(id);
             bookRepository.deleteById(id);
         } else {
             throw new EntityNotFoundException("Book with id %d not found".formatted(id));
@@ -79,9 +79,5 @@ public class BookServiceImpl implements BookService {
         book.setGenre(genre);
         book.setAuthor(author);
         return bookRepository.save(book);
-    }
-
-    private void removeDepententComments(List<String> commentsIds) {
-            commentsIds.stream().forEach(ids -> commentRepository.deleteById(ids));
     }
 }
