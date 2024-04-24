@@ -2,8 +2,14 @@ package ru.otus.hw.changelog;
 
 import com.github.cloudyrock.mongock.ChangeLog;
 import com.github.cloudyrock.mongock.ChangeSet;
-import ru.otus.hw.models.*;
-import ru.otus.hw.repository.*;
+import ru.otus.hw.models.Author;
+import ru.otus.hw.models.Genre;
+import ru.otus.hw.models.Book;
+import ru.otus.hw.models.Comment;
+import ru.otus.hw.repository.AuthorRepository;
+import ru.otus.hw.repository.GenreRepository;
+import ru.otus.hw.repository.BookRepository;
+import ru.otus.hw.repository.CommentRepository;
 
 import java.util.ArrayList;
 import java.util.Arrays;

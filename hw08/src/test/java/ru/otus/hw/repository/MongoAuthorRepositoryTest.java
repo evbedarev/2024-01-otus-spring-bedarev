@@ -20,8 +20,6 @@ public class MongoAuthorRepositoryTest {
 
     private String firstAuthorId;
 
-    private final static String ID_SUFFIX = "a";
-
     private final static String FIRST_AUTHOR_FULL_NAME = "Author_1";
 
     @Autowired
