@@ -1,33 +1,37 @@
 package ru.otus.hw.site;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.dto.BookModifyDto;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Genre;
-import ru.otus.hw.repositories.BookRepository;
-import ru.otus.hw.rest.BookRestController;
+import ru.otus.hw.repositories.AuthorRepository;
+import ru.otus.hw.services.AuthorService;
 import ru.otus.hw.services.BookService;
+import ru.otus.hw.services.GenreService;
+
 import static org.mockito.BDDMockito.given;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-@WebMvcTest({BookController.class, BookRestController.class})
+@WebMvcTest({BookController.class})
 public class BooksControllerTest {
 
     @Autowired
@@ -39,82 +43,100 @@ public class BooksControllerTest {
     @MockBean
     private BookService service;
 
+    @MockBean
+    private AuthorService authorService;
+
+    @MockBean
+    private GenreService genreService;
+
+    @Autowired
+    private BookController bookController;
+
     @Test
     public void shouldReturnCorrectBookList() throws Exception {
         List<Book> books = getDbBooks();
-        given(service.findAll()).willReturn(books);
         List<BookDto> expectedResult = books.stream().map(BookDto::toDt0).toList();
-        mvc.perform(get("/api/books")).andExpect(status().isOk())
-                .andExpect(content().json(mapper.writeValueAsString(expectedResult)));
-
+        given(service.findAll()).willReturn(books);
+        MvcResult result = mvc.perform(get("/"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("books"))
+                .andExpect(model().attributeExists("books"))
+                .andReturn();
+        List<BookDto> actual = (List<BookDto>) result.getModelAndView().getModel().get("books");
+        List<Tuple> expectedResultTuples = expectedResult.stream()
+                .map(e -> new Tuple(e.getTitle(), e.getId()))
+                .collect(Collectors.toList());
+        assertThat(actual)
+                .extracting(BookDto::getTitle, BookDto::getId)
+                .containsExactly(expectedResultTuples.get(0),
+                        expectedResultTuples.get(1),
+                        expectedResultTuples.get(2));
     }
 
     @Test
     public void shouldReturnCorrectBookById() throws Exception {
-        Book book = new Book(1L, "BookTitle_1", getDbAuthors().get(0),getDbGenres().get(0));
-        given(service.findById(book.getId())).willReturn(Optional.of(book));
-        BookDto expectedResult = BookDto.toDt0(book);
-        mvc.perform(get("/api/books/1"))
+        List<Book> books = getDbBooks();
+        BookDto expectedResult = BookDto.toDt0(books.getFirst());
+        given(service.findById(1)).willReturn(Optional.of(books.getFirst()));
+        MvcResult result = mvc.perform(get("/edit?id=1"))
                 .andExpect(status().isOk())
-                .andExpect(content().json(mapper.writeValueAsString(expectedResult)));
+                .andExpect(view().name("edit"))
+                .andExpect(model().attributeExists("modifyBook"))
+                .andExpect(model().attributeExists("bookDto"))
+                .andReturn();
+        BookDto actual = (BookDto) result.getModelAndView().getModel().get("bookDto");
+        assertThat(actual).matches(a -> a.getTitle().equals(expectedResult.getTitle()) &&
+                a.getId() == expectedResult.getId());
     }
 
     @Test
     public void shouldCorrectAddNewBook() throws Exception {
-        Book book = new Book(4L, "BookTitle_4", getDbAuthors().get(1), getDbGenres().get(2));
-        given(service.insert(book.getTitle(),book.getAuthor().getId(),book.getGenre().getId()))
-                .willReturn(book);
-        BookModifyDto bookModifyDto = BookModifyDto.toDto(book);
-        String expectedResult = mapper.writeValueAsString(BookDto.toDt0(book));
-        String requestContent = mapper.writeValueAsString(bookModifyDto);
-        mvc.perform(post("/api/books")
-                        .contentType(APPLICATION_JSON)
-                        .content(requestContent))
-                .andExpect(status().isOk())
-                .andExpect(content().json(expectedResult));
+        BookModifyDto expectedResult = new BookModifyDto(0, "BookTitle_4", 3, 3);
+        mvc.perform(post("/insert")
+                        .flashAttr("modifyBook", expectedResult))
+                .andExpect(status().is(302));
+        verify(service, times(1)).insert(expectedResult.getTitle(),
+                expectedResult.getAuthorId(),
+                expectedResult.getGenreId());
     }
 
     @Test
     public void shouldCorrectUpdateBook() throws Exception {
-        Book book = new Book(4L, "BookTitle_4_updated", getDbAuthors().get(2), getDbGenres().get(2));
-        given(service.update(book.getId(),
-                book.getTitle(),
-                book.getAuthor().getId(),
-                book.getGenre().getId())).willReturn(book);
+        BookModifyDto expectedResult = new BookModifyDto(2, "BookTitle_2_updated", 3, 3);
+        mvc.perform(post("/edit")
+                        .flashAttr("modifyBook", expectedResult))
+                .andExpect(status().is(302));
 
-        BookModifyDto bookModifyDto = BookModifyDto.toDto(book);
-        String expectedResult = mapper.writeValueAsString(BookDto.toDt0(book));
-        String requestContent = mapper.writeValueAsString(bookModifyDto);
-        mvc.perform(patch("/api/books")
-                        .contentType(APPLICATION_JSON)
-                        .content(requestContent))
-                .andExpect(status().isOk())
-                .andExpect(content().json(expectedResult));
+        verify(service, times(1)).update(expectedResult.getId(),
+                expectedResult.getTitle(),
+                expectedResult.getAuthorId(),
+                expectedResult.getGenreId());
     }
 
     @Test
     public void shouldCorrectDeleteBookById() throws Exception {
-        mvc.perform(delete("/api/books/1")).andExpect(status().isOk());
+        mvc.perform(delete("/delete?id=1"))
+                .andExpect(status().is(302));
         verify(service, times(1)).deleteById(1L);
     }
 
     private static List<Author> getDbAuthors() {
         return List.of(new Author(1L, "Author_1"),
-                new Author(2L,"Author_2"),
+                new Author(2L, "Author_2"),
                 new Author(3L, "Author_3"));
     }
 
     private static List<Genre> getDbGenres() {
-        return List.of(new Genre(1L,"Genre_1"),
+        return List.of(new Genre(1L, "Genre_1"),
                 new Genre(2L, "Genre_2"),
-                new Genre(3L,"Genre_3"));
+                new Genre(3L, "Genre_3"));
     }
 
     private static List<Book> getDbBooks() {
         List<Author> dbAuthors = getDbAuthors();
         List<Genre> dbGenres = getDbGenres();
-        return List.of(new Book(1L,"BookTitle_1",dbAuthors.get(0),dbGenres.get(0)),
+        return List.of(new Book(1L, "BookTitle_1", dbAuthors.get(0), dbGenres.get(0)),
                 new Book(2L, "BookTitle_2", dbAuthors.get(1), dbGenres.get(1)),
-                new Book(3L,"BookTitle_3",dbAuthors.get(2),dbGenres.get(2)));
+                new Book(3L, "BookTitle_3", dbAuthors.get(2), dbGenres.get(2)));
     }
 }
