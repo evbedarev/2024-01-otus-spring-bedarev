@@ -40,25 +40,17 @@
     </div>
 
     <div class="row">
-        <label for="book-author-id-input">AuthorId:</label>
-        <input id="book-author-id-input" name="authorId" type="text" th:value="*{authorId}" value="default"/>
-        <div class="errors" th:if="${#fields.hasErrors('authorId')}" th:errors="*{authorId}">Author Id Not found </div>
+        <label for="book-author-list">Author Name:</label>
+        <select id="book-author-list" th:field="${modifyBook.authorId}">
+            <option th:each="author: ${authorsList}" th:value="${author.id}" th:text="${author.fullName}"></option>
+        </select>
     </div>
 
     <div class="row">
-        <label for="author-full-name-input">AuthorName:</label>
-        <input id="author-full-name-input" type="text" readonly="readonly" th:value="${bookDto.author.fullName}" value="default"/>
-    </div>
-
-    <div class="row">
-        <label for="book-genre-id-input">GenreId:</label>
-        <input id="book-genre-id-input" name="genreId" type="text" th:value="*{genreId}" value="default"/>
-        <div class="errors" th:if="${#fields.hasErrors('genreId')}" th:errors="*{genreId}">genre Id not found</div>
-    </div>
-
-    <div class="row">
-        <label for="genre-name-input">GenreName:</label>
-        <input id="genre-name-input" type="text" readonly="readonly" th:value="${bookDto.genre.name}" value="default"/>
+        <label for="book-genre-list">Genres:</label>
+        <select id="book-genre-list" th:field="${modifyBook.genreId}">
+            <option th:each="genre: ${genresList}" th:value="${genre.id}" th:text="${genre.name}"></option>
+        </select>
     </div>
 
     <div class="row">

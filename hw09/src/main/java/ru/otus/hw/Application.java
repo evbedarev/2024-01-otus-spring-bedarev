@@ -8,8 +8,8 @@ public class Application {
 
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
-		System.out.printf("Чтобы проверить себя открывай: %n%s%n%s%n",
-				"http://localhost:8080/books", "http://localhost:8080/edit?id=1");
+		System.out.printf("Чтобы проверить себя открывай: %n%s%n",
+				"http://localhost:8080/");
 	}
 
 }
