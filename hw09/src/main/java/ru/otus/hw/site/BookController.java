@@ -46,8 +46,11 @@ public class BookController {
     @GetMapping("/edit")
     public String editPage(@RequestParam("id") long id, Model model) {
         Book book = bookService.findById(id).orElseThrow(EntityNotFoundException::new);
+        List<Author> authors = authorService.findAll();
+        List<Genre> genres = genreService.findAll();
         model.addAttribute("modifyBook",BookModifyDto.toDto(book));
-        model.addAttribute("bookDto",BookDto.toDt0(book));
+        model.addAttribute("authorsList",authors);
+        model.addAttribute("genresList",genres);
         return "edit";
     }
 
