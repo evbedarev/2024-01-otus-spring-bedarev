@@ -48,7 +48,7 @@
         <td><span th:text="${book.author.fullName}"></span></td>
         <td><span th:text="${book.genre.name}"></span></td>
         <td>
-            <a href="edit.html" th:href="@{/edit(id=${book.id})}">Edit</a>
+            <a href="edit.html" th:href="@{/edit/{id}(id=${book.id})}">Edit</a>
         </td>
         <td>
             <a href="delete.html" th:href="@{/delete(id=${book.id})}">Delete</a>

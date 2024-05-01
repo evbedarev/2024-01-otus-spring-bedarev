@@ -2,12 +2,18 @@ package ru.otus.hw.site;
 
 
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.*;
 import ru.otus.hw.exceptions.EntityNotFoundException;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.dto.BookDto;
@@ -43,8 +49,8 @@ public class BookController {
         return "books";
     }
 
-    @GetMapping("/edit")
-    public String editPage(@RequestParam("id") long id, Model model) {
+    @GetMapping("/edit/{id}")
+    public String editPage(@PathVariable long id, Model model) {
         Book book = bookService.findById(id).orElseThrow(EntityNotFoundException::new);
         List<Author> authors = authorService.findAll();
         List<Genre> genres = genreService.findAll();
@@ -60,17 +66,10 @@ public class BookController {
         if (bindingResult.hasErrors()) {
             return "edit";
         }
-        try {
-            bookService.update(modifyBook.getId(),
+        bookService.update(modifyBook.getId(),
                     modifyBook.getTitle(),
                     modifyBook.getAuthorId(),
                     modifyBook.getGenreId());
-        } catch (EntityNotFoundException ex) {
-            checkExceptionAndAddFieldErr(ex,bindingResult);
-        }
-        if (bindingResult.hasErrors()) {
-            return "edit";
-        }
         return "redirect:/";
     }
 
@@ -92,14 +91,7 @@ public class BookController {
         if (bindingResult.hasErrors()) {
             return "insert";
         }
-        try {
-            bookService.insert(bookModifyDto.getTitle(), bookModifyDto.getAuthorId(), bookModifyDto.getGenreId());
-        } catch (EntityNotFoundException ex) {
-            checkExceptionAndAddFieldErr(ex,bindingResult);
-        }
-        if (bindingResult.hasErrors()) {
-            return "insert";
-        }
+        bookService.insert(bookModifyDto.getTitle(), bookModifyDto.getAuthorId(), bookModifyDto.getGenreId());
         return "redirect:/";
     }
 
@@ -115,12 +107,8 @@ public class BookController {
         return "redirect:/";
     }
 
-    private void checkExceptionAndAddFieldErr(EntityNotFoundException ex, BindingResult bindingResult) {
-        if (ex.getMessage().contains("Author")) {
-            bindingResult.addError(new FieldError("book", "authorId",ex.getMessage()));
-        }
-        if (ex.getMessage().contains("Genre")) {
-            bindingResult.addError(new FieldError("book", "genreId",ex.getMessage()));
-        }
+    @ExceptionHandler(value = EntityNotFoundException.class)
+    private ResponseEntity<String> handleNotFound(EntityNotFoundException ex) {
+        return ResponseEntity.badRequest().body("%s. Maybe already was deleted".formatted(ex.getMessage()));
     }
 }

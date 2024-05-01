@@ -40,6 +40,7 @@
         <select id="book-author-list" th:field="${modifyBook.authorId}">
             <option th:each="author: ${authorsList}" th:value="${author.id}" th:text="${author.fullName}"></option>
         </select>
+        <div class="errors" th:if="${#fields.hasErrors('authorId')}" th:errors="*{authorId}">Wrong book title error</div>
     </div>
 
     <div class="row">
@@ -47,6 +48,7 @@
         <select id="book-genre-list" th:field="${modifyBook.genreId}">
             <option th:each="genre: ${genresList}" th:value="${genre.id}" th:text="${genre.name}"></option>
         </select>
+        <div class="errors" th:if="${#fields.hasErrors('genreId')}" th:errors="*{genreId}">Wrong book title error</div>
     </div>
 
     <div class="row">
