@@ -13,6 +13,7 @@ import ru.otus.hw.dto.BookModifyDto;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Genre;
+
 import ru.otus.hw.services.AuthorService;
 import ru.otus.hw.services.BookService;
 import ru.otus.hw.services.GenreService;
@@ -22,12 +23,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+
 
 
 import java.util.List;
@@ -79,6 +82,7 @@ public class BooksControllerTest {
     @Test
     public void shouldReturnCorrectBookById() throws Exception {
         List<Book> books = getDbBooks();
+
         BookModifyDto expectedResult = BookModifyDto.toDto(books.getFirst());
         given(service.findById(1)).willReturn(Optional.of(books.getFirst()));
         MvcResult result = mvc.perform(get("/edit/1"))
@@ -87,6 +91,7 @@ public class BooksControllerTest {
                 .andExpect(model().attributeExists("modifyBook"))
                 .andReturn();
         BookModifyDto actual = (BookModifyDto) result.getModelAndView().getModel().get("modifyBook");
+
         assertThat(actual).matches(a -> a.getTitle().equals(expectedResult.getTitle()) &&
                 a.getId() == expectedResult.getId());
     }
