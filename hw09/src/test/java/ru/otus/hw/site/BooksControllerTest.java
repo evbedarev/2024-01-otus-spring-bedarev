@@ -13,6 +13,7 @@ import ru.otus.hw.dto.BookModifyDto;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Genre;
+import ru.otus.hw.repositories.AuthorRepository;
 import ru.otus.hw.services.AuthorService;
 import ru.otus.hw.services.BookService;
 import ru.otus.hw.services.GenreService;
@@ -28,6 +29,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 import java.util.List;
@@ -87,6 +90,15 @@ public class BooksControllerTest {
                 .andExpect(model().attributeExists("modifyBook"))
                 .andReturn();
         BookModifyDto actual = (BookModifyDto) result.getModelAndView().getModel().get("modifyBook");
+        BookDto expectedResult = BookDto.toDt0(books.getFirst());
+        given(service.findById(1)).willReturn(Optional.of(books.getFirst()));
+        MvcResult result = mvc.perform(get("/edit?id=1"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("edit"))
+                .andExpect(model().attributeExists("modifyBook"))
+                .andExpect(model().attributeExists("bookDto"))
+                .andReturn();
+        BookDto actual = (BookDto) result.getModelAndView().getModel().get("bookDto");
         assertThat(actual).matches(a -> a.getTitle().equals(expectedResult.getTitle()) &&
                 a.getId() == expectedResult.getId());
     }
