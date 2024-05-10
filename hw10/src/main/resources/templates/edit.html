@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Edit books</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        label {
+            display: inline-block;
+            width: 100px;
+        }
+
+        input:read-only {
+            background: lightgray;
+        }
+
+        .row {
+            margin-top: 10px;
+        }
+    </style>
+    <script>
+        function editBook() {
+            const errAuthorContainer = document.getElementById("err-author")
+            const errGenreContainer = document.getElementById("err-genre")
+            const errTitleContainer = document.getElementById("err-title")
+            const bookIdInput = document.getElementById("id-input")
+
+            const bookTitleInput = document.getElementById("book-title-input")
+            const bookAuthorIdInput = document.getElementById("book-author-list")
+            const bookGenreIdInput = document.getElementById("book-genre-list")
+
+            const book = { id: bookIdInput.value,
+                           title: bookTitleInput.value,
+                           authorId: bookAuthorIdInput.value,
+                           genreId: bookGenreIdInput.value }
+            fetch("/api/v1/books",{
+                method: 'PATCH',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(book)})
+            .then(rawResponse => rawResponse.json())
+            .then(json =>
+                  {
+                      errStr = JSON.stringify(json.err, null, 4)
+                      if (errStr !== "null") {
+                          genreErrorValue = JSON.stringify(json.err.genreError, null, 4);
+                          authorErrorValue = JSON.stringify(json.err.authorError, null, 4);
+                          titleErrorValue = JSON.stringify(json.err.titleError, null, 4);
+
+                          if (genreErrorValue !== "null") {
+                              errGenreContainer.innerHTML = JSON.stringify(json.err.genreError, null, 4);
+                          } else {
+                              errGenreContainer.innerHTML = "";
+                          }
+                          if (authorErrorValue !== "null") {
+                              errAuthorContainer.innerHTML = JSON.stringify(json.err.authorError, null, 4);
+                          } else {
+                              errAuthorContainer.innerHTML = "";
+                          }
+                          if (titleErrorValue !== "null") {
+                              errTitleContainer.innerHTML = JSON.stringify(json.err.titleError, null, 4);
+                          } else {
+                              errTitleContainer.innerHTML = "";
+                          }
+                      } else {
+                          window.location.href = '/';
+                      }
+                  }
+            )
+        }
+    </script>
+</head>
+<body>
+
+<!-- Book edition -->
+<form id="edit-form" action="edit.html"  th:object="${modifyBook}">
+    <h3>Book Edit:</h3>
+
+    <div class="row">
+        <label for="id-input">ID:</label>
+        <input id="id-input" type="text" readonly="readonly" th:value="*{id}" value="default"/>
+    </div>
+
+    <div class="row">
+        <label for="book-title-input">Title:</label>
+        <input id="book-title-input" name="title" type="text" th:value="*{title}" value="default"/>
+        <pre id = "err-title"></pre>
+    </div>
+
+
+    <div class="row">
+        <label for="book-author-list">Author Name:</label>
+        <select id="book-author-list" th:field="${modifyBook.authorId}">
+            <option th:each="author: ${authorsList}" th:value="${author.id}" th:text="${author.fullName}"></option>
+        </select>
+        <pre id = "err-author"></pre>
+    </div>
+
+
+    <div class="row">
+        <label for="book-genre-list">Genres:</label>
+        <select id="book-genre-list" th:field="${modifyBook.genreId}">
+            <option th:each="genre: ${genresList}" th:value="${genre.id}" th:text="${genre.name}"></option>
+        </select>
+        <pre id = "err-genre"></pre>
+    </div>
+
+    <div class="row">
+        <button type="button" onclick="editBook()" >Save</button>
+        <a href="list.html" th:href="@{/}"><button type="button">Cancel</button></a>
+    </div>
+</form>
+
+</body>
+</html>
