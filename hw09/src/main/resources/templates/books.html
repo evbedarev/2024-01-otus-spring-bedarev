@@ -51,7 +51,7 @@
             <a href="edit.html" th:href="@{/edit/{id}(id=${book.id})}">Edit</a>
         </td>
         <td>
-            <a href="delete.html" th:href="@{/delete(id=${book.id})}">Delete</a>
+            <a href="delete.html" th:href="@{/delete/{id}(id=${book.id})}">Delete</a>
         </td>
     </tr>
     </tbody>

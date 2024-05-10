@@ -95,8 +95,8 @@ public class BookController {
         return "redirect:/";
     }
 
-    @GetMapping("/delete")
-    public String deletePage(@RequestParam("id") long id, Model model) {
+    @GetMapping("/delete/{id}")
+    public String deletePage(@PathVariable long id, Model model) {
         model.addAttribute("bookid",id);
         return "delete";
     }
