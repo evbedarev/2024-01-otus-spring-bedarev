@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>List of all books</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        .books {
+            border: 1px solid steelblue;
+            width: 300px;
+            border-collapse: collapse;
+        }
+
+        .books tr td, th {
+            padding: 5px;
+            border: 1px solid steelblue;
+        }
+
+        .books td:last-child, td:first-child {
+            width: 50px;
+        }
+
+        .row {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<h3>Books:</h3>
+
+<table class="books">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Genre</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="book: ${books}">
+        <td><span th:text="${book.id}"></span></td>
+        <td><span th:text="${book.title}"></span></td>
+        <td><span th:text="${book.author.fullName}"></span></td>
+        <td><span th:text="${book.genre.name}"></span></td>
+        <td>
+            <a href="edit.html" th:href="@{/edit/{id}(id=${book.id})}">Edit</a>
+        </td>
+        <td>
+            <a href="delete.html" th:href="@{/delete/{id}(id=${book.id})}">Delete</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<div class="row" >
+    <a href="insert.html" th:href="@{/insert}"><button type="button">Insert</button></a>
+</div>
+
+</body>
+</html>
