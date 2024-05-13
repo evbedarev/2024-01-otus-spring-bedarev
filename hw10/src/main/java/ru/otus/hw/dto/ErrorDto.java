@@ -1,11 +1,11 @@
-package ru.otus.hw.converter;
+package ru.otus.hw.dto;
 
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
 
-public class ErrorConverter {
+public class ErrorDto {
 
     @Setter
     @Getter
@@ -24,7 +24,7 @@ public class ErrorConverter {
     private String titleError;
 
 
-    public ErrorConverter(boolean hasErrors) {
+    public ErrorDto(boolean hasErrors) {
         this.hasErrors = hasErrors;
     }
 

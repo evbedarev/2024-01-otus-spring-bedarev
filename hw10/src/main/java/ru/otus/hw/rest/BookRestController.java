@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PatchMapping;
-import ru.otus.hw.converter.ErrorConverter;
+import ru.otus.hw.dto.ErrorDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.dto.BookDto;
@@ -91,7 +91,7 @@ public class BookRestController {
     }
 
     private BookDto createErrorDto(BindingResult bindingResult) {
-        ErrorConverter errorConverter = new ErrorConverter(true);
+        ErrorDto errorConverter = new ErrorDto(true);
         errorConverter.convertStringsToErr(getAllErrorsFromResult(bindingResult));
         return new BookDto(errorConverter);
     }

@@ -1,6 +1,5 @@
 package ru.otus.hw.dto;
 
-import ru.otus.hw.converter.ErrorConverter;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Genre;
@@ -14,7 +13,7 @@ public class BookDto {
 
     private Genre genre;
 
-    private ErrorConverter err;
+    private ErrorDto err;
 
     public BookDto() {
     }
@@ -26,7 +25,7 @@ public class BookDto {
         this.genre = genre;
     }
 
-    public BookDto(ErrorConverter err) {
+    public BookDto(ErrorDto err) {
         this.err = err;
     }
 
@@ -70,11 +69,11 @@ public class BookDto {
         return new BookDto(book.getId(),book.getTitle(),book.getAuthor(),book.getGenre());
     }
 
-    public ErrorConverter getErr() {
+    public ErrorDto getErr() {
         return err;
     }
 
-    public void setErr(ErrorConverter err) {
+    public void setErr(ErrorDto err) {
         this.err = err;
     }
 }
