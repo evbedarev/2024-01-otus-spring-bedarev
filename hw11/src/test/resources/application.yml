@@ -1,12 +1,16 @@
 spring:
   data:
     mongodb:
-      port: 0 # when flapdoodle using
-      database: company
+      #port: 0 # when flapdoodle using
+      #database: company
+      authentication-database: admin
+      username: myUserAdmin
+      password: Qq123456
+      database: user_db
+      port: 27017
+      host: localhost
 
-
-de:
-  flapdoodle:
-    mongodb:
-      embedded:
-        version: 4.0.2
+mongock:
+  migration-scan-package:
+    - ru.otus.hw.changelog
+  #runner-type: applicationrunner

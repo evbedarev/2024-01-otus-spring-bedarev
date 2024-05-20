@@ -1,8 +1,7 @@
 package ru.otus.hw.changelog;
 
-import com.github.cloudyrock.mongock.ChangeLog;
-import com.github.cloudyrock.mongock.ChangeSet;
-import com.mongodb.client.MongoDatabase;
+import io.mongock.api.annotations.*;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.repository.AuthorRepository;
@@ -11,27 +10,51 @@ import ru.otus.hw.repository.BookRepository;
 import java.util.ArrayList;
 import java.util.List;
 
-@ChangeLog
+@ChangeUnit(id="homework8", order = "1", author = "bev")
 public class DatabaseChangelog {
 
     private List<Author> authors = new ArrayList<>();
 
     private List<Book> books = new ArrayList<>();
 
-    @ChangeSet(order = "001", id = "drop DB", author = "bev", runAlways = true)
-    public void dropDatabase(MongoDatabase mongoDatabase) {
-        mongoDatabase.drop();
+    private final AuthorRepository authorRepository;
+    private final BookRepository bookRepository;
+
+    private final MongoTemplate mongoTemplate;
+
+    public DatabaseChangelog(AuthorRepository authorRepository, BookRepository bookRepository, MongoTemplate mongoTemplate) {
+        this.authorRepository = authorRepository;
+        this.bookRepository = bookRepository;
+        this.mongoTemplate = mongoTemplate;
     }
 
-    @ChangeSet(order = "002", id = "insertAuthors", author = "bev")
-    public void insertAuthors(AuthorRepository repository) {
-        authors.add(repository.save(new Author("Author_2")).block());
-        authors.add(repository.save(new Author("Author_3")).block());
+
+    @BeforeExecution
+    public void beforeExecution() {
+        clearCollections();
     }
 
-    @ChangeSet(order = "003", id = "insertBooks", author = "bev")
-    public void insertBooks(BookRepository repository) {
-        repository.save(new Book("Title_1",authors.get(0))).block();
-        repository.save(new Book("Title_2",authors.get(1))).block();
+    @Execution
+    public void initDb(AuthorRepository repository, BookRepository bookRepository) {
+        Author authorOne = repository.save(new Author("Author_1")).block();
+        repository.save(new Author("Author_2")).block();
+        repository.save(new Author("Author_3")).block();
+        bookRepository.save(new Book("Title_1", authorOne)).block();
+
+    }
+
+    private void clearCollections() {
+        authorRepository.deleteAll().block();
+        bookRepository.deleteAll().block();
+    }
+
+    @RollbackExecution
+    public void rollback() {
+        clearCollections();
+    }
+
+    @RollbackBeforeExecution
+    public void rollbackBefore() {
+        clearCollections();
     }
 }

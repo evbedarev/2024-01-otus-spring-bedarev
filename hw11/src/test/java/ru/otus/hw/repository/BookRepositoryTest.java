@@ -1,5 +1,6 @@
 package ru.otus.hw.repository;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,6 +22,10 @@ public class BookRepositoryTest {
     @Autowired
     private AuthorRepository authorRepository;
 
+    @BeforeEach
+    void deleteAll() {
+        bookRepository.deleteAll().block();
+    }
 
     @Test
     void shouldCorrectAddNewBook() {
@@ -28,12 +33,10 @@ public class BookRepositoryTest {
         Mono<Book> bookMono = bookRepository.save(new Book("title", authorMono.block()));
         StepVerifier
                 .create(bookMono)
-                .assertNext(book -> assertNotNull(book.getId()))
-                .expectComplete()
-                .verify();
-        StepVerifier
-                .create(bookMono)
-                .assertNext(book -> assertEquals(book.getTitle(),"title"))
+                .assertNext(book -> {
+                    assertNotNull(book.getId());
+                    assertEquals(book.getTitle(), "title");
+                })
                 .expectComplete()
                 .verify();
     }
@@ -47,12 +50,12 @@ public class BookRepositoryTest {
         Mono<Book> bookMonoChanged = bookRepository.save(new Book(id, "new_title", author));
         StepVerifier
                 .create(bookMonoChanged)
-                .assertNext(book -> assertEquals(book.getId(),id))
+                .assertNext(book -> assertEquals(book.getId(), id))
                 .expectComplete()
                 .verify();
         StepVerifier
                 .create(bookMonoChanged)
-                .assertNext(book -> assertEquals(book.getTitle(),"new_title"))
+                .assertNext(book -> assertEquals(book.getTitle(), "new_title"))
                 .expectComplete()
                 .verify();
     }
@@ -65,17 +68,15 @@ public class BookRepositoryTest {
         Mono<Book> bookMono = bookRepository.save(new Book("title_get_by_id", author));
         String id = bookMono.block().getId();
         Mono<Book> actualBook = bookRepository.findById(id);
+        System.out.println(actualBook.block().getId());
         StepVerifier
                 .create(actualBook)
-                .assertNext(book -> assertEquals(book.getTitle(),"title_get_by_id"))
+                .assertNext(book -> {
+                    assertEquals(book.getTitle(), "title_get_by_id");
+                    assertEquals(book.getId(), id);
+                })
                 .expectComplete()
                 .verify();
-        StepVerifier
-                .create(actualBook)
-                .assertNext(book -> assertEquals(book.getId(),id))
-                .expectComplete()
-                .verify();
-
     }
 
     @Test
@@ -93,7 +94,6 @@ public class BookRepositoryTest {
                 .assertNext(book -> assertEquals(book.getId(), idTwo))
                 .expectComplete()
                 .verify();
-
     }
 }
 
