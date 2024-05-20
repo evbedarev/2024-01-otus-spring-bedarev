@@ -9,12 +9,3 @@ spring:
       database: user_db
       port: 27017
       host: localhost
-mongock:
-  #runner-type: "ApplicationRunner" # default
-  runner-type: "InitializingBean"
-  change-logs-scan-package:
-    - ru.otus.hw.changelog
-  mongo-db:
-    write-concern:
-      journal: false
-    read-concern: local

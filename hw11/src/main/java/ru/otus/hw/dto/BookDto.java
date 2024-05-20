@@ -48,7 +48,7 @@ public class BookDto {
         return new Book(dto.getId(), dto.getTitle(), dto.getAuthor());
     }
 
-    public static BookDto toDt0(Book book) {
+    public static BookDto toDto(Book book) {
         return new BookDto(book.getId(),book.getTitle(),book.getAuthor());
     }
 }
