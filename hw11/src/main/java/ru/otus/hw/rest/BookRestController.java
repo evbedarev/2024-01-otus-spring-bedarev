@@ -48,7 +48,7 @@ public class BookRestController {
                         .flatMap(bookRepository::save)
                         .map(BookDto::toDto)
                         .map(ResponseEntity::ok)
-                        .switchIfEmpty(Mono.fromCallable(() -> ResponseEntity.notFound().build()));
+                        .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
     }
 
     @PatchMapping("/api/v1/books")
@@ -60,7 +60,7 @@ public class BookRestController {
                 .flatMap(bookRepository::save)
                 .map(BookDto::toDto)
                 .map(ResponseEntity::ok)
-                .switchIfEmpty(Mono.fromCallable(() -> ResponseEntity.notFound().build()));
+                .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
     }
 
     @DeleteMapping("/api/v1/books/{id}")
@@ -74,7 +74,7 @@ public class BookRestController {
                 .flatMap(author -> bookRepository.save(new Book("new_title_%s".formatted(id), author)))
                 .map(BookDto::toDto)
                 .map(ResponseEntity::ok)
-                .switchIfEmpty(Mono.fromCallable(() -> ResponseEntity.notFound().build()));
+                .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
 
     }
 }
