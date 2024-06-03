@@ -21,11 +21,7 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/login").permitAll()
-                        .requestMatchers("/").authenticated()
-                        .requestMatchers("/edit/**").authenticated()
-                        .requestMatchers("/insert").authenticated()
-                        .requestMatchers("/delete/**").authenticated()
-                        .requestMatchers("/api/v1/books/**").authenticated()
+                        .anyRequest().authenticated()
                 ).formLogin(Customizer.withDefaults());
         return http.build();
     }

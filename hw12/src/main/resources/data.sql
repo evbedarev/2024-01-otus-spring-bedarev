@@ -11,5 +11,5 @@ insert into books(title, author_id, genre_id)
 values ('BookTitle_1', 1, 1), ('BookTitle_2', 2, 2), ('BookTitle_3', 3, 3);
 
 insert into users(username, password, role)
-values ('admin', 'admin', 'ADMIN_ROLE'), ('user', 'password', 'USER_ROLE');
+values ('admin', 'admin', 'ROLE_ADMIN'), ('user', 'password', 'ROLE_USER');
 

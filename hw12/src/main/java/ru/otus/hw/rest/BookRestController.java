@@ -2,6 +2,9 @@ package ru.otus.hw.rest;
 
 
 import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -32,6 +35,10 @@ public class BookRestController {
 
     @GetMapping("/api/v1/books")
     public List<BookDto> listAllBooks() {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        Authentication authentication = securityContext.getAuthentication();
+        System.out.println(authentication.isAuthenticated());
+        //System.out.println(authentication.getCredentials().toString());
         return bookService.findAll().stream()
                 .map(BookDto::toDt0)
                 .collect(Collectors.toList());

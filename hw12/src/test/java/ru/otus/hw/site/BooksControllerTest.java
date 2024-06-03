@@ -1,34 +1,38 @@
 package ru.otus.hw.site;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Genre;
+import ru.otus.hw.security.SecurityConfiguration;
 import ru.otus.hw.services.AuthorService;
 import ru.otus.hw.services.BookService;
 import ru.otus.hw.services.GenreService;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
-@WebMvcTest({BookController.class})
-@ExtendWith({SpringExtension.class})
+@WebMvcTest({BookController.class, SecurityConfiguration.class})
 public class BooksControllerTest {
 
     @Autowired
     private MockMvc mvc;
+
+    @Autowired
+    private SecurityConfiguration securityConfiguration;
 
     @MockBean
     private BookService bookService;
@@ -48,65 +52,28 @@ public class BooksControllerTest {
 
     @WithMockUser(
             username = "admin",
-            authorities = {"ADMIN_ROLE"}
+            authorities = {"ROLE_ADMIN"}
     )
-    @Test
-    public void shouldCorrectGetRootPage() throws Exception {
-        mvc.perform(get("/")).andExpect(status().isOk());
-
+    @DisplayName("Проверяет доступные эндпоинты для аутентифицированного пользователя")
+    @ParameterizedTest
+    @MethodSource("getUris")
+    void shouldCorrectGetPages(String uri) throws Exception {
+        mvc.perform(get(uri)).andExpect(status().isOk());
     }
 
-    @Test
-    public void shouldFailWhenGetRootPage() throws Exception {
-        mvc.perform(get("/")).andExpect(status().isUnauthorized());
-
+    @DisplayName("Проверяет что для неаутентифицированного пользователя выдает редирект")
+    @ParameterizedTest
+    @MethodSource("getUris")
+    void shouldFailWhenGetPages(String uri) throws Exception {
+        mvc.perform(get(uri)).andExpect(status().is3xxRedirection());
     }
 
-    @WithMockUser(
-            username = "admin",
-            authorities = {"ADMIN_ROLE"}
-    )
-    @Test
-    public void shouldCorrectGetEditPage() throws Exception {
-        mvc.perform(get("/edit/1")).andExpect(status().isOk());
-    }
 
-    @Test
-    public void shouldFailWhenGetEditPage() throws Exception {
-        mvc.perform(get("/edit/1")).andExpect(status().isUnauthorized());
-    }
-
-    @WithMockUser(
-            username = "admin",
-            authorities = {"ADMIN_ROLE"}
-    )
-    @Test
-    public void shouldCorrectGetInsertPage() throws Exception {
-        mvc.perform(get("/insert")).andExpect(status().isOk());
-    }
-
-    @Test
-    public void shouldFailWhenGetInsertPage() throws Exception {
-        mvc.perform(get("/insert")).andExpect(status().isUnauthorized());
-    }
-
-    @WithMockUser(
-            username = "admin",
-            authorities = {"ADMIN_ROLE"}
-    )
-    @Test
-    public void shouldCorrectGetDeletePage() throws Exception {
-        mvc.perform(get("/delete/1")).andExpect(status().isOk());
-    }
-
-    @Test
-    public void shouldFailWhenGetDeletePage() throws Exception {
-        mvc.perform(get("/delete/1")).andExpect(status().isUnauthorized());
+    private static List<String> getUris() {
+        return Arrays.asList("/","/edit/1","/insert","/delete/1");
     }
 
     private final Book getBook() {
         return new Book(1L, "ttl", new Author(1L, "1"), new Genre(1L, "Some_title"));
     }
-
-
 }
