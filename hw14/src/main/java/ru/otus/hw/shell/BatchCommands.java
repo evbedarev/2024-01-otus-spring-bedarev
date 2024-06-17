@@ -14,20 +14,10 @@ public class BatchCommands {
 
     private final Job importBookJob;
 
-    private final Job importAuthorJob;
-
-    private final Job importGenreJob;
-
     private final JobLauncher jobLauncher;
 
     @ShellMethod(value = "starMigrationFromMongoToH2", key = "mth")
     public void startMigrationFromMongoToFile() throws Exception {
-        JobExecution executionAuthor = jobLauncher.run(
-                importAuthorJob, new JobParametersBuilder().toJobParameters()
-        );
-        JobExecution executionGenre = jobLauncher.run(
-                importGenreJob, new JobParametersBuilder().toJobParameters()
-        );
         JobExecution execution = jobLauncher.run(
                 importBookJob, new JobParametersBuilder().toJobParameters()
         );
