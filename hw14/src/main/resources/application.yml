@@ -5,6 +5,10 @@ spring:
   batch:
     job:
       enabled: false
+  sql:
+    init:
+      mode: always
+      schema-locations: schema.sql
 
   shell:
     interactive:

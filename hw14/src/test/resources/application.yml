@@ -5,7 +5,10 @@ spring:
     mongodb:
       port: 0 # when flapdoodle using
       database: company
-
+  sql:
+    init:
+      mode: always
+      schema-locations: schema.sql
   batch:
     job:
       enabled: false

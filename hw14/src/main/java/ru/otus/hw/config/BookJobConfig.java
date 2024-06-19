@@ -13,6 +13,7 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.data.MongoPagingItemReader;
 import org.springframework.batch.item.data.builder.MongoPagingItemReaderBuilder;
+import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.ItemPreparedStatementSetter;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
@@ -26,7 +27,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Genre;
-import ru.otus.hw.service.PrepareMigrationService;
 import ru.otus.hw.service.FinalStepService;
 
 import java.sql.PreparedStatement;
@@ -52,9 +52,6 @@ public class BookJobConfig {
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
-    private PrepareMigrationService prepareMigrationService;
-
-    @Autowired
     private FinalStepService finalStepService;
 
     @Bean
@@ -78,7 +75,8 @@ public class BookJobConfig {
     @Bean
     public JdbcBatchItemWriter<Book> bookWriter() {
         return new JdbcBatchItemWriterBuilder<Book>()
-                .namedParametersJdbcTemplate(new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource()))
+                .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
+                .dataSource(jdbcTemplate.getDataSource())
                 .itemPreparedStatementSetter(new ItemPreparedStatementSetter<Book>() {
                     @Override
                     public void setValues(Book item, PreparedStatement ps) throws SQLException {
@@ -127,7 +125,8 @@ public class BookJobConfig {
     @Bean
     public JdbcBatchItemWriter<Author> authorWriter() {
         return new JdbcBatchItemWriterBuilder<Author>()
-                .namedParametersJdbcTemplate(new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource()))
+                .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
+                .dataSource(jdbcTemplate.getDataSource())
                 .itemPreparedStatementSetter(new ItemPreparedStatementSetter<Author>() {
                     @Override
                     public void setValues(Author item, PreparedStatement ps) throws SQLException {
@@ -172,7 +171,8 @@ public class BookJobConfig {
     @Bean
     public JdbcBatchItemWriter<Genre> genreWriter() {
         return new JdbcBatchItemWriterBuilder<Genre>()
-                .namedParametersJdbcTemplate(new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource()))
+                .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
+                .dataSource(jdbcTemplate.getDataSource())
                 .itemPreparedStatementSetter(new ItemPreparedStatementSetter<Genre>() {
                     @Override
                     public void setValues(Genre item, PreparedStatement ps) throws SQLException {
@@ -199,30 +199,13 @@ public class BookJobConfig {
     public Job importBookJob(Step transformBookStep,
                              Step transformAuthorStep,
                              Step transformGenreStep,
-                             Step prepareTableStep,
                              Step finalStep) {
         return new JobBuilder(IMPORT_BOOK_JOB_NAME, jobRepository)
                 .incrementer(new RunIdIncrementer())
-                .start(prepareTableStep)
-                .next(transformAuthorStep)
+                .start(transformAuthorStep)
                 .next(transformGenreStep)
                 .next(transformBookStep)
                 .next(finalStep)
-                .build();
-    }
-
-    @Bean
-    public MethodInvokingTaskletAdapter prepareTableTasklet() {
-        MethodInvokingTaskletAdapter adapter = new MethodInvokingTaskletAdapter();
-        adapter.setTargetObject(prepareMigrationService);
-        adapter.setTargetMethod("prepare");
-        return adapter;
-    }
-
-    @Bean
-    public Step prepareTableStep() {
-        return new StepBuilder("prepareTableStep",jobRepository)
-                .tasklet(prepareTableTasklet(), platformTransactionManager)
                 .build();
     }
 
