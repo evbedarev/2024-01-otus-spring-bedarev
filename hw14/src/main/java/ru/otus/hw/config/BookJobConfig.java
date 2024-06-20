@@ -13,8 +13,7 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.data.MongoPagingItemReader;
 import org.springframework.batch.item.data.builder.MongoPagingItemReaderBuilder;
-import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
-import org.springframework.batch.item.database.ItemPreparedStatementSetter;
+import org.springframework.batch.item.database.ItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,15 +21,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.transaction.PlatformTransactionManager;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Genre;
 import ru.otus.hw.service.FinalStepService;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.HashMap;
 
 @Configuration
@@ -75,19 +73,19 @@ public class BookJobConfig {
     @Bean
     public JdbcBatchItemWriter<Book> bookWriter() {
         return new JdbcBatchItemWriterBuilder<Book>()
-                .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                .dataSource(jdbcTemplate.getDataSource())
-                .itemPreparedStatementSetter(new ItemPreparedStatementSetter<Book>() {
+                .namedParametersJdbcTemplate(new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource()))
+                .itemSqlParameterSourceProvider(new ItemSqlParameterSourceProvider<Book>() {
                     @Override
-                    public void setValues(Book item, PreparedStatement ps) throws SQLException {
-                        ps.setString(1, item.getTitle());
-                        ps.setString(2, item.getId());
-                        ps.setString(3, item.getAuthor().getId());
-                        ps.setString(4, item.getGenre().getId());
+                    public SqlParameterSource createSqlParameterSource(Book item) {
+                        return new MapSqlParameterSource("title", item.getTitle())
+                                .addValue("id", item.getId())
+                                .addValue("author_mongo_id", item.getAuthor().getId())
+                                .addValue("genre_mongo_id", item.getGenre().getId());
                     }
                 })
                 .sql("INSERT INTO tmp" +
-                        "(title, book_mongo_id, author_mongo_id, genre_mongo_id) VALUES (?, ?, ?, ?)")
+                        "(title, book_mongo_id, author_mongo_id, genre_mongo_id) " +
+                        "VALUES (:title, :id, :author_mongo_id, :genre_mongo_id)")
                 .build();
     }
 
@@ -125,16 +123,15 @@ public class BookJobConfig {
     @Bean
     public JdbcBatchItemWriter<Author> authorWriter() {
         return new JdbcBatchItemWriterBuilder<Author>()
-                .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                .dataSource(jdbcTemplate.getDataSource())
-                .itemPreparedStatementSetter(new ItemPreparedStatementSetter<Author>() {
+                .namedParametersJdbcTemplate(new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource()))
+                .itemSqlParameterSourceProvider(new ItemSqlParameterSourceProvider<Author>() {
                     @Override
-                    public void setValues(Author item, PreparedStatement ps) throws SQLException {
-                        ps.setString(1, item.getFullName());
-                        ps.setString(2, item.getId());
+                    public SqlParameterSource createSqlParameterSource(Author item) {
+                        return new MapSqlParameterSource("fullName", item.getFullName())
+                                .addValue("id", item.getId());
                     }
                 })
-                .sql("INSERT INTO tmp_author(full_name, mongo_id) VALUES (?, ?)")
+                .sql("INSERT INTO tmp_author(full_name, mongo_id) VALUES (:fullName, :id)")
                 .build();
     }
 
@@ -171,16 +168,15 @@ public class BookJobConfig {
     @Bean
     public JdbcBatchItemWriter<Genre> genreWriter() {
         return new JdbcBatchItemWriterBuilder<Genre>()
-                .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                .dataSource(jdbcTemplate.getDataSource())
-                .itemPreparedStatementSetter(new ItemPreparedStatementSetter<Genre>() {
+                .namedParametersJdbcTemplate(new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource()))
+                .itemSqlParameterSourceProvider(new ItemSqlParameterSourceProvider<Genre>() {
                     @Override
-                    public void setValues(Genre item, PreparedStatement ps) throws SQLException {
-                        ps.setString(1, item.getName());
-                        ps.setString(2, item.getId());
+                    public SqlParameterSource createSqlParameterSource(Genre item) {
+                        return new MapSqlParameterSource("name", item.getName())
+                                .addValue("id", item.getId());
                     }
                 })
-                .sql("INSERT INTO tmp_genre(name, mongo_id) VALUES (?, ?)")
+                .sql("INSERT INTO tmp_genre(name, mongo_id) VALUES (:name, :id)")
                 .build();
     }
 
@@ -188,7 +184,7 @@ public class BookJobConfig {
     public Step transformGenreStep(ItemReader<Genre> genreReader, JdbcBatchItemWriter<Genre> genreWriter,
                                    ItemProcessor<Genre, Genre> genreProcessor) {
         return new StepBuilder("transformGenreStep", jobRepository)
-                .<Genre, Genre>chunk(CHUNK_SIZE,platformTransactionManager)
+                .<Genre, Genre>chunk(CHUNK_SIZE, platformTransactionManager)
                 .reader(genreReader)
                 .processor(genreProcessor)
                 .writer(genreWriter)
@@ -219,7 +215,7 @@ public class BookJobConfig {
 
     @Bean
     public Step finalStep() {
-        return new StepBuilder("finalStep",jobRepository)
+        return new StepBuilder("finalStep", jobRepository)
                 .tasklet(finalStepTasklet(), platformTransactionManager)
                 .build();
     }
