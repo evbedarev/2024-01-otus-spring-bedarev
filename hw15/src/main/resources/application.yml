@@ -1,0 +1,8 @@
+spring:
+  main:
+    allow-circular-references: true
+logging:
+  level:
+    root: info
+
+    org.springframework.integration: debug
