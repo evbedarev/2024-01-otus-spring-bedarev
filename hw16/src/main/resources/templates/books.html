@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8"/>
+    <title>List of all books</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        .books {
+            border: 1px solid steelblue;
+            width: 300px;
+            border-collapse: collapse;
+        }
+
+        .books tr td, th {
+            padding: 5px;
+            border: 1px solid steelblue;
+        }
+
+        .books td:last-child, td:first-child {
+            width: 50px;
+        }
+
+        .row {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body >
+<h3>Books:</h3>
+
+<table class="books" id="data-book-table">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Genre</th>
+        <th></th>
+    </tr>
+    </thead>
+</table>
+<script>
+    function getBooks() {
+        const bookContainer = document.getElementById("data-book-table")
+        var tableContent = ``
+        fetch("api/v1/books", {
+            method: 'GET'})
+        .then(rawResponse => rawResponse.json())
+        .then(json => json.forEach(b => {
+            tableContent = `<tr>`;
+            tableContent += `<td>` + b.id + `</td>`;
+            tableContent += `<td>` + b.title + `</td>`;
+            tableContent += `<td>` + b.author.fullName + `</td>`;
+            tableContent += `<td>` + b.genre.name + `</td>`;
+            tableContent += `<td><a href="/edit/` + b.id + `">Edit</a>` + `</td>`;
+            tableContent += `<td><a href="/delete/` + b.id + `">Delete</a>` + `</td>`;
+            tableContent += `</tr>`;
+            bookContainer.innerHTML += tableContent;}))
+    };
+    window.onload = getBooks;
+</script>
+<div class="row" >
+    <a href="insert.html" th:href="@{/insert}"><button type="button">Insert</button></a>
+</div>
+<pre id = "dataContainer"></pre>
+</body>
+</html>

@@ -1,0 +1,43 @@
+spring:
+  h2:
+    console:
+      enabled: true
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+  liquibase:
+    enabled: false
+  datasource:
+    url: jdbc:h2:mem:maindb
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:data.sql
+      schema-locations: classpath:schema.sql
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+  data:
+    rest:
+      basePath: /datarest
+management:
+  endpoint:
+    logfile:
+      enabled: true
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: logfile, health, metrics, prometheus
+logging:
+  file:
+    name: application.log
+
+log4j:
+  rootLogger: INFO, file
+  appender:
+    file: org.apache.log4j.RollingFileAppender
