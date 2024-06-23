@@ -2,9 +2,6 @@ package ru.otus.hw.rest;
 
 
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -91,6 +88,8 @@ public class BookRestController {
             bindingResult.addError(new FieldError("book", "genreId", "Genre with id not found"));
         }
     }
+
+
 
     private List<String> getAllErrorsFromResult(BindingResult bindingResult) {
         return bindingResult

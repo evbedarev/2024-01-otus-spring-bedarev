@@ -2,3 +2,4 @@
 target
 spring-shell.log
 **/*.iml
+**/*.log

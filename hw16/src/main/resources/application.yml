@@ -25,9 +25,19 @@ spring:
       basePath: /datarest
 management:
   endpoint:
+    logfile:
+      enabled: true
     health:
       show-details: always
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: logfile, health, metrics, prometheus
+logging:
+  file:
+    name: application.log
+
+log4j:
+  rootLogger: INFO, file
+  appender:
+    file: org.apache.log4j.RollingFileAppender

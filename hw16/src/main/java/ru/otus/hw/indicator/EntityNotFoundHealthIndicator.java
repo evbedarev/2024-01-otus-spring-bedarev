@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class EntityNotFoundHealthIndicator implements HealthIndicator {
 
-    private boolean hasError = false;
+    private volatile boolean hasError = false;
 
     @Override
     public Health health() {
@@ -19,7 +19,7 @@ public class EntityNotFoundHealthIndicator implements HealthIndicator {
         }
     }
 
-    public void setHasError(boolean hasError) {
+    public synchronized void  setHasError(boolean hasError) {
         this.hasError = hasError;
     }
 }
