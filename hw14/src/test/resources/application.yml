@@ -1,0 +1,43 @@
+spring:
+  main:
+    allow-circular-references: true
+  data:
+    mongodb:
+      port: 0 # when flapdoodle using
+      database: company
+  sql:
+    init:
+      mode: always
+      schema-locations: schema.sql
+  batch:
+    job:
+      enabled: false
+
+  shell:
+    interactive:
+      enabled: false
+    command:
+      version:
+        enabled: false
+
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+        version: 4.0.2
+
+mongock:
+  #runner-type: "ApplicationRunner" # default
+  runner-type: "InitializingBean"
+  change-logs-scan-package:
+    - ru.otus.hw.changelog
+  mongo-db:
+    write-concern:
+      journal: false
+    read-concern: local
