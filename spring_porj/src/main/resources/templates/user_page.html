@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8"/>
+    <title>List of all books</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        .books {
+            border: 1px solid steelblue;
+            width: 900px;
+            border-collapse: collapse;
+        }
+
+        .books tr td, th {
+            padding: 5px;
+            border: 1px solid steelblue;
+        }
+
+        .books td:last-child, td:first-child {
+            width: 50px;
+        }
+
+        .row {
+            margin-top: 10px;
+        }
+        .top-right {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .hidden {
+          clip: rect(0 0 0 0);
+          clip-path: inset(50%);
+          height: 1px;
+          overflow: hidden;
+          position: absolute;
+          white-space: nowrap;
+          width: 1px;
+        }
+    </style>
+</head>
+<body >
+<h3>Books:</h3>
+<form id="find-book-form" action="books.html">
+    <div class="row">
+        <label for="find-book-input">Find book by title:</label>
+        <input id="find-book-input" name="book" type="text" value=""/>
+        <button type="button" onclick="findBookByTitle()">Find</button>
+    </div>
+    <div class="row"></div>
+</form>
+<form id="find-book-form-author" action="books.html">
+    <div class="row">
+        <label for="find-book-by-author-input">Find book by author:</label>
+        <input id="find-book-by-author-input" name="book" type="text" value=""/>
+        <button type="button" onclick="findBookByAuthor()">Find</button>
+    </div>
+    <div class="row"></div>
+</form>
+<script>
+    function findBookByTitle() {
+        const bookContainer = document.getElementById("data-book-table")
+        var tableContent = ``
+        bookContainer.innerHTML = `<thead><tr><th>ID</th><th>Title</th><th>Author</th><th>Genre</th><th></th></tr></thead>`;
+        const bookTitle = document.getElementById("find-book-input")
+        const book = { id: '1', title: bookTitle.value, authorId: 1, genreId: 1}
+        fetch("/api/v1/books/find/title",{
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(book)})
+        .then(rawResponse => rawResponse.json())
+        .then(json =>
+            {
+                bookContainer.innerHTML = '';
+                tableContent = `<tr>`;
+                tableContent += `<td>` + json.id + `</td>`;
+                tableContent += `<td>` + json.title + `</td>`;
+                tableContent += `<td>` + json.author.fullName + `</td>`;
+                tableContent += `<td>` + json.genre.name + `</td>`;
+                tableContent += `<td><a href="/text_user/` + json.id + `">Read</a>` + `</td>`;
+                tableContent += `</tr>`;
+                bookContainer.innerHTML += tableContent;
+            })
+        hide(document.getElementById('find-book-input-row'));
+    };
+    function show (elements, specifiedDisplay) {
+      elements = elements.length ? elements : [elements];
+      for (var index = 0; index < elements.length; index++) {
+        elements[index].style.display = specifiedDisplay || 'block';
+      }
+    };
+    function hide (elements) {
+      elements = elements.length ? elements : [elements];
+      for (var index = 0; index < elements.length; index++) {
+        elements[index].style.display = 'none';
+      }
+    }
+    function findBookByAuthor() {
+        const bookContainer = document.getElementById("data-book-table")
+        var tableContent = ``
+        bookContainer.innerHTML = `<thead><tr><th>ID</th><th>Title</th><th>Author</th><th>Genre</th><th></th></tr></thead>`;
+        const bookAuthor = document.getElementById("find-book-by-author-input")
+        const book = { id: '1', fullName: bookAuthor.value, aboutAuthor: 'null'}
+        fetch("/api/v1/books/find/author",{
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(book)})
+        .then(rawResponse => rawResponse.json())
+        .then(json => json.forEach(b => {
+            tableContent = `<tr>`;
+            tableContent += `<td>` + b.id + `</td>`;
+            tableContent += `<td>` + b.title + `</td>`;
+            tableContent += `<td>` + b.author.fullName + `</td>`;
+            tableContent += `<td>` + b.genre.name + `</td>`;
+            tableContent += `<td><a href="/text_user/` + b.id + `">Read</a>` + `</td>`;
+            tableContent += `</tr>`;
+            bookContainer.innerHTML += tableContent;}))
+    };
+</script>
+<table class="books" id="data-book-table">
+    <thead>
+    <tr>
+        <th style="width:1%">ID</th>
+        <th style="width:25%">Title</th>
+        <th style="width:25%">Author</th>
+        <th style="width:25%">Genre</th>
+        <th style="width:12%"></th>
+    </tr>
+    </thead>
+</table>
+<script>
+    var curPage = 0;
+    var countPages = 0;
+    function getBooks() {
+        const bookContainer = document.getElementById("data-book-table")
+        bookContainer.innerHTML = `<thead><tr><th>ID</th><th>Title</th><th>Author</th><th>Genre</th><th></th></tr></thead>`;
+        var tableContent = ``
+        fetch("api/v1/books/pages/" + curPage, {
+            method: 'GET'})
+        .then(rawResponse => rawResponse.json())
+        .then(json => {
+            json.page.forEach(b =>
+            {
+                tableContent = `<tr>`;
+                tableContent += `<td>` + b.id + `</td>`;
+                tableContent += `<td>` + b.title + `</td>`;
+                tableContent += `<td>` + b.author.fullName + `</td>`;
+                tableContent += `<td>` + b.genre.name + `</td>`;
+                tableContent += `<td><a href="/text_user/` + b.id + `">Read</a>` + `</td>`;
+                tableContent += `</tr>`;
+                bookContainer.innerHTML += tableContent;
+            })
+            countPages = json.maxCountPages;
+            document.querySelector('#count-pages').textContent = countPages;
+            document.querySelector('#cur-page').textContent = curPage + 1;
+            }
+        )
+    };
+    function nextPage() {
+        if (curPage < countPages - 1) {
+            curPage++;
+            getBooks();
+        }
+    }
+    function previousPage() {
+        if (curPage >= 1) {
+            curPage--;
+            getBooks();
+        }
+    }
+    window.onload = getBooks;
+</script>
+<div class="row" id="find-book-input-row">Pages: <span id="count-pages"></span>  Page: <span id="cur-page"></span>
+    <button type="button" onclick="previousPage()">PrevPage</button>
+    <button type="button" onclick="nextPage()">NextPage</button>
+</div>
+<div class="row" >
+    <a href="books.html" th:href="@{/}"><button type="button">show all books</button></a>
+</div>
+<pre id = "dataContainer"></pre>
+<div class="top-right">
+    <a href="books.html" th:href="@{/admin}"><button type="button">Admin Page</button></a>
+    <a href="books.html" th:href="@{/logout}"><button type="button">Logout</button></a>
+</div>
+</body>
+</html>

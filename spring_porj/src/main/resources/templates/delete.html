@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Delete book</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        label {
+            display: inline-block;
+            width: 100px;
+        }
+
+        input:read-only {
+            background: lightgray;
+        }
+
+        .row {
+            margin-top: 10px;
+        }
+    </style>
+    <script>
+        function deleteBook() {
+            const bookIdInput = document.getElementById("id-input")
+            const err = document.getElementById("err-input")
+            fetch("/api/v1/books/" + bookIdInput.value ,{
+                method: 'DELETE'})
+            .then(response => {
+                if (response.status == "200")
+                    window.location.href = '/admin';
+                if (response.status == "500")
+                    err.innerHTML = "Book not found with id=" + bookIdInput.value;
+            })
+        }
+    </script>
+</head>
+<body>
+
+<!-- Book deletion-->
+<form id="delete-form" action="delete.html" th:action="@{/delete(id=${bookid})}" th:method="DELETE" th:object="${bookid}">
+    <h3>Book Delete:</h3>
+
+    <div class="row">
+        <label for="id-input">ID:</label>
+        <input id="id-input" type="text" readonly="readonly" th:value="${bookid}" value="default"/>
+        <pre id = "err-input"></pre>
+    </div>
+
+    <div class="row">
+        <button type="button" onclick="deleteBook()">Delete</button>
+        <a href="list.html" th:href="@{/admin}"><button type="button">Cancel</button></a>
+    </div>
+</form>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Edit books</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        label {
+            display: inline-block;
+            width: 100px;
+        }
+
+        input:read-only {
+            background: lightgray;
+        }
+
+        .row {
+            margin-top: 10px;
+        }
+        .file-picker {}
+    </style>
+    <script>
+        function insertAuthor() {
+            const errFnContainer = document.getElementById("err-full-name-input")
+            const fullNameInput = document.getElementById("full-name-input")
+            const aboutAuthorInput = document.getElementById("about-author-input")
+
+            const author = { fullName: fullNameInput.value,
+                             aboutAuthor: aboutAuthorInput.value
+                           }
+            console.log(author)
+            fetch("/api/v1/authors",{
+                method: 'POST',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(author)})
+            .then(rawResponse => rawResponse.json())
+            .then(json =>
+                  {
+                      console.log(JSON.stringify(json.authorErrorDto.hasErrors, null, 4))
+                      if (JSON.stringify(json.authorErrorDto.hasErrors, null, 4) == "true") {
+                          document.getElementById('err-full-name-input').style='display:block;';
+                          document.querySelector('#err-full-name-input').textContent =
+                                 JSON.stringify(json.authorErrorDto.fullNameError, null, 4);
+                      } else {
+                          document.getElementById('err-full-name-input').style='display:none;';
+                      }
+                  })
+            window.location.href = '/admin';
+        }
+    </script>
+<body>
+    <h3>Add new Author</h3>
+    <div class="row">
+        <label for="full-name-input">Full Name:</label>
+        <input size="100" id="full-name-input" name="full-name" value=""/>
+        <p id="err-full-name-input"></p>
+    </div>
+    <div class="row">
+        <label for="about-author-input">About author:</label>
+        <input size="150" id="about-author-input" name="about-author" value=""/>
+    </div>
+    <div class="row">
+        <button type="button" onclick="insertAuthor()">Save</button>
+        <a href="list.html" th:href="@{/author}"><button type="button">Back</button></a>
+    </div>
+
+</body>
+</html>
