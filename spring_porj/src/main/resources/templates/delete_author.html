@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Delete author</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        label {
+            display: inline-block;
+            width: 100px;
+        }
+
+        input:read-only {
+            background: lightgray;
+        }
+
+        .row {
+            margin-top: 10px;
+        }
+    </style>
+    <script>
+        function deleteAuthor() {
+            const authorIdInput = document.getElementById("id-input")
+            fetch("/api/v1/authors/" + authorIdInput.value ,{
+                method: 'DELETE'})
+            .then(response => response.json())
+            .then(json => {
+                    console.log(json);
+                    if (JSON.stringify(json.authorErrorDto.hasErrors, null, 4) == "true") {
+                          document.getElementById('err-input').style='display:block;';
+                          document.querySelector('#err-input').textContent =
+                                 JSON.stringify(json.authorErrorDto.fullNameError, null, 4);
+                    } else {
+                          window.location.href = '/author';
+                    }
+            })
+        }
+    </script>
+</head>
+<body>
+
+<!-- Book deletion-->
+<form id="delete-form" action="delete_author.html" th:object="${authorDto}">
+    <h3>Author Delete:</h3>
+
+    <div class="row">
+        <label for="id-input">ID:</label>
+        <input id="id-input" type="text" readonly="readonly" th:value="*{id}" value="default"/>
+        <pre id = "err-input"></pre>
+    </div>
+
+    <div class="row">
+        <label for="full-name-input">FullName:</label>
+        <input size="100" id="full-name-input" type="text" readonly="readonly" th:value="*{fullName}" value="default"/>
+    </div>
+
+    <div class="row">
+        <label for="about-author-input">AboutAuthor:</label>
+        <input size="100" id="about-author-input" type="text" readonly="readonly" th:value="*{aboutAuthor}" value="default"/>
+    </div>
+
+    <div class="row">
+        <button type="button" onclick="deleteAuthor()">Delete</button>
+        <a href="list.html" th:href="@{/author}"><button type="button">Cancel</button></a>
+    </div>
+</form>
+</body>
+</html>

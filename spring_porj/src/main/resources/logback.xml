@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <property name="LOGS" value="./logs" />
+
+    <appender name="Console"
+              class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+                <pattern>%date %level [%thread] %logger{10} [%file:%line] - %msg%n</pattern>
+        </layout>
+    </appender>
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>application.log</file> <!-- Specify the file name here -->
+        <encoder>
+            <pattern>%date %level [%thread] %logger{10} [%file:%line] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- LOG everything at INFO level -->
+    <root level="info">
+        <appender-ref ref="FILE" />
+        <appender-ref ref="Console" />
+    </root>
+
+</configuration>
