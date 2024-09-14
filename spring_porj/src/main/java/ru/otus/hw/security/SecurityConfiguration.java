@@ -21,7 +21,10 @@ public class SecurityConfiguration {
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
                 .authorizeHttpRequests(authorize -> authorize
-                        //.requestMatchers("/login").permitAll()
+                        //.requestMatchers("/**").permitAll()
+                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/actuator").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/register").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/v1/user").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/v1/books/find/title").hasAnyRole("USER","ADMIN")
@@ -45,7 +48,6 @@ public class SecurityConfiguration {
                         .requestMatchers("/**").hasRole("ADMIN")
                 );
         http.formLogin(auth -> auth.loginPage("/login").permitAll());
-                //.formLogin().loginPage("login").loginProcessingUrl("/auth").permitAll();
         return http.build();
     }
 

@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.exceptions.EntityNotFoundException;
@@ -26,14 +27,9 @@ public class BookmarkServiceImpl implements BookmarksService {
     private final BookRepository bookRepository;
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE)
     public Bookmark insertBookmark(long bookId, int curPage, int partNum) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        if (bookmarksRepository.findByBookIdAndUsername(bookId, username).isPresent()) {
-           bookmarksRepository.deleteByBookIdAndUsername(bookId, username);
-           logger.info("Delete old bookmark for bookId: %d".formatted(bookId));
-        }
+        String username = deleteBookmarkByBookIdAndUsername(bookId);
         if (!bookRepository.existsById(bookId)) {
             throw new EntityNotFoundException("Book with id %s not found".formatted(bookId));
         }
@@ -47,5 +43,22 @@ public class BookmarkServiceImpl implements BookmarksService {
     public Optional<Bookmark> findBookmark(long bookId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return bookmarksRepository.findByBookIdAndUsername(bookId, authentication.getName());
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE)
+    public String deleteBookmarkByBookIdAndUsername(long bookId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        if (bookmarksRepository.findByBookIdAndUsername(bookId, username).isPresent()) {
+            bookmarksRepository.deleteByBookIdAndUsername(bookId, username);
+            logger.info("Delete old bookmark for bookId: %d".formatted(bookId));
+        }
+        return username;
+    }
+
+    @Override
+    public void deleteAllBookmarksByBookId(long bookId) {
+        bookmarksRepository.deleteByBookId(bookId);
     }
 }

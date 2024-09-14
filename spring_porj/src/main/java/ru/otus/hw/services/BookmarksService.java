@@ -8,4 +8,8 @@ public interface BookmarksService {
     Bookmark insertBookmark(long bookId, int curPage, int partNum);
 
     Optional<Bookmark> findBookmark(long bookId);
+
+    String deleteBookmarkByBookIdAndUsername(long bookId);
+
+    void deleteAllBookmarksByBookId(long bookId);
 }

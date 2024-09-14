@@ -48,7 +48,7 @@ public class TextBookDto {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < splitedPages.size(); i++) {
             stringBuilder.append(splitedPages.get(i) + "\n");
-            if (i % 50 == 0) {
+            if (i % 50 == 0 && i > 0) {
                 pages.add(stringBuilder.toString());
                 stringBuilder = new StringBuilder();
             }

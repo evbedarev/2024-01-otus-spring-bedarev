@@ -12,9 +12,9 @@ public class BookPagesDto {
 
     @Getter
     @Setter
-    public List<Book> page;
+    private List<Book> page;
 
     @Getter
     @Setter
-    public int maxCountPages;
+    private int maxCountPages;
 }

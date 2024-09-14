@@ -28,10 +28,15 @@ public class AuthorRestController {
     }
 
     @GetMapping("/api/v1/authors")
-    public List<AuthorDto> listAllBooks() {
+    public List<AuthorDto> listAllAuthors() {
         return authorService.findAll().stream()
                 .map(AuthorDto::toDto)
                 .collect(Collectors.toList());
+    }
+
+    @GetMapping("/api/v1/authors/{id}")
+    public AuthorDto findAuthorById(@PathVariable("id") long id) {
+        return AuthorDto.toDto(authorService.findById(id));
     }
 
     @PostMapping("/api/v1/authors")

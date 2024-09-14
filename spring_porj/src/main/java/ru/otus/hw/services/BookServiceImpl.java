@@ -50,8 +50,8 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Page<Book> findAllInPages(int pageNum) {
-        Pageable firstTwoElm = PageRequest.of(pageNum, PAGE_SIZE, Sort.by(SORTED_BY));
-        Page<Book> bookPage = bookRepository.findAll(firstTwoElm);
+        Pageable firstFiveElm = PageRequest.of(pageNum, PAGE_SIZE, Sort.by(SORTED_BY));
+        Page<Book> bookPage = bookRepository.findAll(firstFiveElm);
         return bookPage;
     }
 

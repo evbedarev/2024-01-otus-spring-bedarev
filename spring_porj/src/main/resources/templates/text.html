@@ -22,9 +22,9 @@
         }
     </style>
     <script>
-        var curPage = 0;
+        var curPage = -1;
         var pageText = []
-        var partNum = 0;
+        var partNum = 1;
         var minPage = 0;
         var maxPage = 0;
         var maxPartNumber = 0;
@@ -54,7 +54,7 @@
             .then(json => {
                 pageText = json.formattedTextSplitOnPages
                 minPage = json.minPage;
-                maxPage = json.maxPage;
+                maxPage = json.maxPage - 1;
                 maxPartNumber = json.maxPartNumber;
                 document.querySelector('#max-part').textContent = json.maxPartNumber;
                 document.querySelector('#cur-part').textContent = partNum;
@@ -62,6 +62,7 @@
                 document.querySelector('#cur-page').textContent = curPage;
                 document.querySelector('#text-area').textContent = json.formattedTextSplitOnPages[curPage];
             })
+            rememberPage();
         }
         function showPrevText() {
             const bookId = document.getElementById("id-input");
@@ -72,8 +73,8 @@
                 console.log(json)
                 pageText = json.formattedTextSplitOnPages
                 minPage = json.minPage;
-                maxPage = json.maxPage;
-                curPage = json.maxPage;
+                maxPage = json.maxPage - 1;
+                curPage = json.maxPage - 1;
                 maxPartNumber = json.maxPartNumber;
                 document.querySelector('#count-pages').textContent = json.maxPage;
                 document.querySelector('#max-part').textContent = json.maxPartNumber;
@@ -81,27 +82,30 @@
                 document.querySelector('#cur-page').textContent = curPage;
                 document.querySelector('#text-area').textContent = json.formattedTextSplitOnPages[curPage];
             })
+            rememberPage();
         }
         function nextPage() {
             if (curPage < maxPage) {
                 curPage++;
                 document.querySelector('#cur-page').textContent = curPage;
                 document.querySelector('#text-area').textContent = pageText[curPage];
+                rememberPage();
             } else {
                 if (partNum < maxPartNumber) {
                     partNum++;
-                    curPage = 0;
+                    curPage = -1;
                     showText()
                 }
             }
         }
         function prevPage() {
-            if (curPage > 1) {
+            if (curPage > 0) {
                 curPage--;
                 document.querySelector('#cur-page').textContent = curPage;
                 document.querySelector('#text-area').textContent = pageText[curPage];
+                rememberPage();
             } else {
-                if (partNum > 0) {
+                if (partNum > 1) {
                     partNum--;
                     showPrevText();
                 }

@@ -38,6 +38,15 @@ public class GenreRestController {
         }
     }
 
+    @GetMapping("/api/v1/genres/{id}")
+    public GenreDto getGenreById(@PathVariable("id") long id) {
+        try {
+            return GenreDto.toDto(genreService.findById(id));
+        } catch (EntityAlreadyExistsException exception) {
+            return new GenreDto(0, "",exception.getMessage());
+        }
+    }
+
     @DeleteMapping("/api/v1/genres/{id}")
     public GenreDto deleteNewGenre(@PathVariable("id") long id) {
         try {

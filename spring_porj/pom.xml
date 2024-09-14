@@ -18,6 +18,7 @@
         <java.version>21</java.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
+        <h2.version>2.2.220</h2.version>
         <snakeyaml.version>2.0</snakeyaml.version>
         <checkstyle-plugin.version>3.2.2</checkstyle-plugin.version>
         <checkstyle.version>10.11.0</checkstyle.version>
@@ -55,6 +56,14 @@
             <artifactId>postgresql</artifactId>
             <version>42.7.3</version>
         </dependency>
+
+        <!-- <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+            <version>${h2.version}</version>
+        </dependency>
+        -->
 
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -94,6 +103,15 @@
             <artifactId>logback-core</artifactId>
             <version>1.5.6</version>
         </dependency>
+        <!-- HEALTH & METRICS -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -125,6 +143,7 @@
                 </executions>
             </plugin>
         </plugins>
+        <finalName>library-app</finalName>
     </build>
 
 </project>

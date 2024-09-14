@@ -17,6 +17,7 @@ public interface BookTextRepository  extends JpaRepository<BookText, Long> {
     boolean existsByBookId(long bookId);
 
     @Modifying
+    @Query("delete from BookText b where b.book.id = :bookId")
     void deleteByBookId(long bookId);
 
     @Modifying

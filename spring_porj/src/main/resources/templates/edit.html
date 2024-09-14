@@ -75,42 +75,16 @@
         }
     </script>
     <script charset="UTF-8">
-        async function chooseFile() {
-            await deleteText();
+        async function uploadOneFile() {
             const bookId = document.getElementById("id-input");
             const [fileHandle] = await window.showOpenFilePicker()
             const file = await fileHandle.getFile('utf-8')
-            const fileContent = await file.text('utf-8')
-            const bookIdInput = document.getElementById("id-input")
-            var splited = fileContent.split('\n')
-            var countRows = 200;
-            var listForJson = []
-            var indexOfPart = 0;
-            var bookLines = {}
-            await splited.forEach((line, index) => {
-                if (index < countRows && index < splited.length - 1) {
-                   listForJson.push(line.replace('\r',''))
-                } else {
-                    bookLines = {
-                        unformatedText:  listForJson,
-                        partNumber: indexOfPart,
-                        bookId: bookId.value
-                    }
-                    listForJson = []
-                    countRows = countRows + 201
-                    indexOfPart++
-                    console.log(bookLines)
-                    fetch("/api/v1/text",{
-                        method: 'POST',
-                        headers: {
-                          'Accept': 'application/json',
-                          'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(bookLines)})
-                }
-            })
-            await sleep(1000)
-            setPages();
+            let form = new FormData();
+	        form.append('file', file);
+            fetch("/api/v1/text/upload/" + bookId.value,{
+                                method: 'POST',
+                                body: form})
+
         }
         function setPages() {
             const bookId = document.getElementById("id-input");
@@ -162,7 +136,7 @@
         <pre id = "err-genre"></pre>
     </div>
     <div class="row">
-        <button type="button" onclick="chooseFile()" >Load file</button>
+        <button type="button" onclick="uploadOneFile()" >Load One file</button>
     </div>
     <div class="row">
         <button type="button" onclick="setPages()" >Set Pages</button>

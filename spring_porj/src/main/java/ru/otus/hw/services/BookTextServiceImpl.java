@@ -43,12 +43,18 @@ public class BookTextServiceImpl implements BookTextService {
                 stringBuilder.append(line + "\n");
             }
         }
-        BookText bookText = new BookText(0, stringBuilder.toString(), partNumber, book.get());
-        int maxPage = getCountPages(bookText);
-        bookText.setMaxPage(maxPage);
-        logger.info("Insert text for bookId=%d, partNumber=%d, countPages=%d"
-                .formatted(bookId, partNumber, maxPage));
-        bookTextRepository.save(bookText);
+        logger.debug("====== INSERT PAGE PART NUBER %s =======".formatted(partNumber));
+        logger.debug(stringBuilder.toString());
+        logger.debug("====== END PAGE =======");
+        if (!stringBuilder.toString().trim().isEmpty()) {
+            BookText bookText = new BookText(0, stringBuilder.toString(), partNumber, book.get());
+            int maxPage = getCountPages(bookText);
+            bookText.setMaxPage(maxPage);
+            logger.debug("Set count pages: " + maxPage);
+            logger.info("Insert text for bookId=%d, partNumber=%d, countPages=%d"
+                    .formatted(bookId, partNumber, maxPage));
+            bookTextRepository.save(bookText);
+        }
     }
 
     @Override
@@ -88,30 +94,37 @@ public class BookTextServiceImpl implements BookTextService {
 
     private StringBuilder splitLongLine(String line) {
         StringBuilder stringBuilder = new StringBuilder();
+        boolean exitOnSplitLine = false;
         while (line.length() > COUNT_CHARS_IN_ROWS) {
             int wsPos = 0;
             wsPos = line.indexOf(" ", COUNT_CHARS_IN_ROWS);
             if (wsPos > 0) {
                 stringBuilder.append(line.substring(0, wsPos) + "\n");
                 line = line.substring(wsPos);
+                exitOnSplitLine = true;
             } else {
                 stringBuilder.append(line + "\n");
+                exitOnSplitLine = false;
                 break;
             }
+        }
+        if (exitOnSplitLine)  {
+            stringBuilder.append(line + "\n");
         }
         return stringBuilder;
     }
 
     @Transactional
     private void setMinPagesOnText(long bookId, int partNumber) {
-        int prevPartMaxPage = bookTextRepository.getMaxPageByBookIdAndPartNum(bookId, partNumber - 1);
-        int prevPartMinPage = bookTextRepository.getMinPageByBookIdAndPartNum(bookId,partNumber -1);
+        logger.debug("setMinPagesOnText with params bookid: %d, partNum: %d".formatted(bookId,partNumber));
+        int prevPartMaxPage = bookTextRepository.getMaxPageByBookIdAndPartNum(bookId, partNumber);
+        int prevPartMinPage = bookTextRepository.getMinPageByBookIdAndPartNum(bookId,partNumber);
         bookTextRepository.updateMinPageByBookIdAndPartNum(bookId, partNumber,
                 (prevPartMinPage + prevPartMaxPage) + 1);
     }
 
     private int getCountPages(BookText bookText) {
         List<String> splitedPages = Arrays.asList(bookText.getBookText().split("\n"));
-        return ((splitedPages.size()/50) + (splitedPages.size() % 50 > 0 ? 1 : 0));
+        return  ((splitedPages.size()/50) + (splitedPages.size() > 201 ? 1 : 0));
     }
 }
