@@ -469,3 +469,68 @@ databaseChangeLog:
               - column:
                   name: genre_id
                   value: 3
+  - changeSet:
+      id: 14
+      author: bev
+      comment: "Insert bookmarks table"
+      changes:
+        - insert:
+            tableName: bookmarks
+            columns:
+              - column:
+                  name: username
+                  value: "madjo"
+              - column:
+                  name: book_id
+                  value: 1
+              - column:
+                  name: part_num
+                  value: 1
+              - column:
+                  name: cur_page
+                  value: 1
+        - insert:
+            tableName: bookmarks
+            columns:
+              - column:
+                  name: username
+                  value: "admin"
+              - column:
+                  name: book_id
+                  value: 1
+              - column:
+                  name: part_num
+                  value: 5
+              - column:
+                  name: cur_page
+                  value: 7
+        - insert:
+            tableName: bookmarks
+            columns:
+              - column:
+                  name: username
+                  value: "admin"
+              - column:
+                  name: book_id
+                  value: 2
+              - column:
+                  name: part_num
+                  value: 12
+              - column:
+                  name: cur_page
+                  value: 32
+        - insert:
+            tableName: bookmarks
+            columns:
+              - column:
+                  name: username
+                  value: "madjo"
+              - column:
+                  name: book_id
+                  value: 2
+              - column:
+                  name: part_num
+                  value: 12
+              - column:
+                  name: cur_page
+                  value: 32

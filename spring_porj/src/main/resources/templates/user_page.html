@@ -40,6 +40,15 @@
           white-space: nowrap;
           width: 1px;
         }
+        .c-button {
+            appearance: none;
+            border: 0;
+            border-radius: 8px;
+            background: #4676D7;
+            color: #fff;
+            padding: 6px 10x;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body >
@@ -188,8 +197,8 @@
 </div>
 <pre id = "dataContainer"></pre>
 <div class="top-right">
-    <a href="books.html" th:href="@{/admin}"><button type="button">Admin Page</button></a>
-    <a href="books.html" th:href="@{/logout}"><button type="button">Logout</button></a>
+    <a href="books.html" th:href="@{/admin}"><button class="c-button" type="button">Admin Page</button></a>
+    <a href="books.html" th:href="@{/logout}"><button class="c-button" type="button">Logout</button></a>
 </div>
 </body>
 </html>
