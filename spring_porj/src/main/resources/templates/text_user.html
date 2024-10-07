@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+        label {
+            display: inline-block;
+            width: 100px;
+        }
+
+        input:read-only {
+            background: lightgray;
+        }
+        .row {
+            margin-top: 10px;
+        }
+    </style>
+    <script>
+        var curPage = -1;
+        var pageText = []
+        var partNum = 1;
+        var minPage = 0;
+        var maxPage = 0;
+        var maxPartNumber = 0;
+        function getBookmark() {
+            const bookId = document.getElementById("id-input");
+            fetch("/api/v1/books/" + bookId.value ,{
+                method: 'GET'})
+            .then(rawResponse => rawResponse.json())
+            .then(json => {
+                console.log(json);
+                document.querySelector('#title-input').textContent =  JSON.stringify(json.title, null, 4);
+                console.log(json.title);
+            })
+            fetch("/api/v1/bookmarks/" + bookId.value ,{
+                method: 'GET'})
+            .then(rawResponse => rawResponse.json())
+            .then(json => {
+                console.log(json)
+                if (JSON.stringify(json.hasError, null, 4) == "false") {
+                    partNum = JSON.stringify(json.partNum, null, 4)
+                    curPage = JSON.stringify(json.curPage, null, 4)
+                    curPage--;
+                    showText();
+                } else {
+                    showText();
+                }
+            })
+        }
+        function showText() {
+            const bookId = document.getElementById("id-input");
+            curPage++;
+            fetch("/api/v1/text/" + bookId.value + "/" + partNum,{
+                method: 'GET'})
+            .then(rawResponse => rawResponse.json())
+            .then(json => {
+                pageText = json.formattedTextSplitOnPages
+                minPage = json.minPage;
+                maxPage = json.maxPage - 1;
+                maxPartNumber = json.maxPartNumber;
+                document.querySelector('#max-part').textContent = json.maxPartNumber;
+                document.querySelector('#cur-part').textContent = partNum;
+                document.querySelector('#count-pages').textContent = json.maxPage;
+                document.querySelector('#cur-page').textContent = curPage;
+                document.querySelector('#text-area').textContent = json.formattedTextSplitOnPages[curPage];
+            })
+            rememberPage();
+        }
+        function showPrevText() {
+            const bookId = document.getElementById("id-input");
+            fetch("/api/v1/text/" + bookId.value + "/" + partNum,{
+                method: 'GET'})
+            .then(rawResponse => rawResponse.json())
+            .then(json => {
+                console.log(json)
+                pageText = json.formattedTextSplitOnPages
+                minPage = json.minPage;
+                maxPage = json.maxPage - 1;
+                curPage = json.maxPage - 1;
+                maxPartNumber = json.maxPartNumber;
+                document.querySelector('#count-pages').textContent = json.maxPage;
+                document.querySelector('#max-part').textContent = json.maxPartNumber;
+                document.querySelector('#cur-part').textContent = partNum;
+                document.querySelector('#cur-page').textContent = curPage;
+                document.querySelector('#text-area').textContent = json.formattedTextSplitOnPages[curPage];
+            })
+            rememberPage();
+        }
+        function nextPage() {
+            if (curPage < maxPage) {
+                curPage++;
+                console.log(curPage)
+                console.log(maxPage)
+                document.querySelector('#cur-page').textContent = curPage;
+                document.querySelector('#text-area').textContent = pageText[curPage];
+                rememberPage();
+            } else {
+                if (partNum < maxPartNumber) {
+                    partNum++;
+                    curPage = -1;
+                    showText()
+                }
+            }
+        }
+        function prevPage() {
+            if (curPage > 0) {
+                curPage--;
+                document.querySelector('#cur-page').textContent = curPage;
+                document.querySelector('#text-area').textContent = pageText[curPage];
+                rememberPage();
+            } else {
+                if (partNum > 1) {
+                    partNum--;
+                    showPrevText();
+                }
+
+            }
+        }
+        function rememberPage() {
+            const bookId = document.getElementById("id-input");
+            const bookmark = {
+                               bookId: bookId.value,
+                               partNum: partNum,
+                               curPage: curPage }
+
+            fetch("/api/v1/bookmarks",{
+                method: 'POST',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(bookmark)})
+            .then(rawResponse => rawResponse.json())
+            .then(json => {
+                if (JSON.stringify(json.hasError, null, 4) == "true") {
+                   document.getElementById('error-save').style='display:block;';
+                   document.querySelector('#error-save').textContent = `Remember error`
+                } else {
+                   document.getElementById('error-save').style='display:none;';
+                }
+            })
+        }
+        function changeFont(font) {
+            document.getElementById("text-area").style.fontFamily = font.value;
+        }
+        function apfsize() {
+            var fsize = document.getElementById("fsize").value;
+            fsize = Number(fsize)
+            document.getElementById("text-area").style.fontSize = fsize + "px";
+        }
+        window.onload = getBookmark;
+    </script>
+</head>
+<body>
+<form id="text-form" action="text.html" th:object="${bookid}">
+    <div class="row">
+        <label for="id-input">BOOK ID:</label>
+        <input id="id-input" type="text" readonly="readonly" th:value="${bookid}" value="default"/>
+        <label for="title-input">  TITLE:</label><span id="title-input"></span>
+    </div>
+</form>
+<div class="row">
+    <textarea id="text-area" cols="130" rows="55"></textarea>
+</div>
+<div class="row">MaxPart: <span id="max-part"></span> | Part: <span id="cur-part"></span> | Pages:
+    <span id="count-pages"></span> | Page: <span id="cur-page"></span> |
+    <button type="button" onclick="prevPage()">PrevPage</button>
+    <button type="button" onclick="nextPage()">NextPage</button>
+    <button type="button" onclick="rememberPage()">RememberPage</button>
+</div>
+<div class="row">
+    <pre id = "error-save"></pre>
+</div>
+<div class="row">
+    <label for="select-font">Font:</label>
+    <select id="select-font" onchange="changeFont(this);">
+        <option value="Arial">Arial</option>
+        <option value="Sans Serif" selected>Sans Serif</option>
+        <option value="Comic Sans MS">Comic Sans MS</option>
+        <option value="Times New Roman">Times New Roman</option>
+        <option value="Courier New">Courier New</option>
+        <option value="Verdana">Verdana</option>
+        <option value="Trebuchet MS">Trebuchet MS</option>
+        <option value="Arial Black">Arial Black</option>
+        <option value="Impact">Impact</option>
+        <option value="Bookman">Bookman</option>
+        <option value="Garamond">Garamond</option>
+        <option value="Palatino">Palatino</option>
+        <option value="Georgia">Georgia</option>
+    </select>
+    <input id = "fsize" placeholder="Font Size" type="number"/>
+    <button id = "apfsizeid" onclick="apfsize()">Apply Font Size</button>
+</div>
+<div class="row">
+    <a href="list.html" th:href="@{/}"><button type="button">Back</button></a>
+</div>
+</body>
+</html>

@@ -1,0 +1,1 @@
+ curl -v -F file=@test_long_lines.txt -XPOST http://localhost:8443/api/v1/text/upload/1

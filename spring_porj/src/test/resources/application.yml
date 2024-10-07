@@ -1,0 +1,15 @@
+spring:
+  test:
+    database:
+      replace: none
+  jpa:
+    database: postgresql
+    show-sql: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/test_library
+    username: madjo
+    password: Qq123456
+    driver-class-name: org.postgresql.Driver
+  liquibase:
+    enabled: true
+    drop-first: true

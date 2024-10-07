@@ -1,0 +1,536 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: bev
+      changes:
+        - createTable:
+            tableName: authors
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: full_name
+                  type: varchar(255)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: about_author
+                  type: varchar(255)
+                  constraints:
+                    unique: false
+                    nullable: true
+  - changeSet:
+      id: 2
+      author: bev
+      changes:
+        - createTable:
+            tableName: genres
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    unique: true
+                    nullable: false
+  - changeSet:
+      id: 3
+      author: bev
+      changes:
+        - createTable:
+            tableName: comments
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: text
+                  type: varchar(255)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: book_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 4
+      author: bev
+      comment: "Insert authors table"
+      changes:
+        - insert:
+            tableName: authors
+            columns:
+              - column:
+                  name: full_name
+                  value: "Фёдор Миха́йлович Достое́вский"
+              - column:
+                  name: about_author
+                  value: "Фёдор Достоевский – классик русской литературы, философ и публицист."
+        - insert:
+            tableName: authors
+            columns:
+              - column:
+                  name: full_name
+                  value: "Александр Сергеевич Пушкин"
+              - column:
+                  name: about_author
+                  value: "Александр Пушкин – великий русский поэт, прозаик, драматург, один из самых авторитетных литературных деятелей первой трети XIX века."
+        - insert:
+            tableName: authors
+            columns:
+              - column:
+                  name: full_name
+                  value: "Александр Николаевич Островский"
+              - column:
+                  name: about_author
+                  value: "Александр Николаевич Островский – культовый драматург, новатор и создатель традиционного русского театра."
+        - insert:
+            tableName: authors
+            columns:
+              - column:
+                  name: full_name
+                  value: "Иван Сергеевич Тургенев"
+              - column:
+                  name: about_author
+                  value: "Иван Сергеевич Тургенев – русский поэт, писатель, драматург, публицист и переводчик."
+        - insert:
+            tableName: authors
+            columns:
+              - column:
+                  name: full_name
+                  value: "Владимир Владимирович Маяковский"
+              - column:
+                  name: about_author
+                  value: "Владимир Владимирович Маяковский – один из величайших поэтов-футуристов двадцатого века."
+        - insert:
+            tableName: authors
+            columns:
+              - column:
+                  name: full_name
+                  value: "Михаил Юрьевич Лермонтов"
+              - column:
+                  name: about_author
+                  value: "Михаил Юрьевич Лермонтов – великий поэт и прозаик."
+  - changeSet:
+      id: 5
+      author: bev
+      comment: "Insert genres table"
+      changes:
+        - insert:
+            tableName: genres
+            columns:
+              - column:
+                  name: name
+                  value: "роман"
+        - insert:
+            tableName:  genres
+            columns:
+              - column:
+                  name: name
+                  value: "стихотворение"
+        - insert:
+            tableName: genres
+            columns:
+              - column:
+                  name: name
+                  value: "повесть"
+        - insert:
+            tableName: genres
+            columns:
+              - column:
+                  name: name
+                  value: "рассказ"
+  - changeSet:
+      id: 6
+      author: bev
+      comment: "Insert comments table"
+      changes:
+        - insert:
+            tableName: comments
+            columns:
+              - column:
+                  name: text
+                  value: Comment_1
+              - column:
+                  name: book_id
+                  value: 1
+        - insert:
+            tableName: comments
+            columns:
+              - column:
+                  name: text
+                  value: Comment_11
+              - column:
+                  name: book_id
+                  value: 1
+        - insert:
+            tableName: comments
+            columns:
+              - column:
+                  name: text
+                  value: Comment_2
+              - column:
+                  name: book_id
+                  value: 2
+        - insert:
+            tableName: comments
+            columns:
+              - column:
+                  name: text
+                  value: Comment_3
+              - column:
+                  name: book_id
+                  value: 3
+  - changeSet:
+      id: 7
+      author: bev
+      changes:
+        - createTable:
+            tableName: books_text
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: book_text
+                  type: clob
+              - column:
+                  name: part_number
+                  type: int
+                  constraints:
+                    nullable: false
+                    unique: false
+              - column:
+                  name: max_part_number
+                  type: int
+                  constraints:
+                    nullable: true
+                    unique: false
+              - column:
+                  name: min_page
+                  type: int
+                  constraints:
+                    nullable: true
+                    unique: false
+              - column:
+                  name: max_page
+                  type: int
+                  constraints:
+                    nullable: true
+                    unique: false
+              - column:
+                  name: book_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 8
+      author: bev
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: username
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: password
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: false
+              - column:
+                  name: role
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+                    unique: false
+  - changeSet:
+      id: 9
+      author: bev
+      comment: "Insert user table"
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: username
+                  value: admin
+              - column:
+                  name: password
+                  value: "$2y$10$qg4mWx.SR25ck0C7s9jWPu9QErHJHg4yj8ucFjgcuutMZg/UsN72u"
+              - column:
+                  name: role
+                  value: "ROLE_ADMIN"
+  - changeSet:
+      id: 10
+      author: bev
+      comment: "Create bookmarks table"
+      changes:
+        - createTable:
+            tableName: bookmarks
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: username
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: false
+              - column:
+                  name: book_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: part_num
+                  type: int
+                  constraints:
+                    nullable: false
+                    unique: false
+              - column:
+                  name: cur_page
+                  type: int
+                  constraints:
+                    nullable: false
+                    unique: false
+  - changeSet:
+      id: 11
+      author: bev
+      changes:
+        - createTable:
+            tableName: books
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: title
+                  type: varchar(255)
+                  constraints:
+                    unique: false
+                    nullable: true
+              - column:
+                  name: author_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_book_author
+                    references: authors(id)
+                    onDelete: NO ACTION
+              - column:
+                  name: genre_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_book_genre
+                    references: genres(id)
+                    onDelete: NO ACTION
+              - column:
+                  name: comment_id
+                  type: BIGINT
+                  constraints:
+                    nullable: true
+                    foreignKeyName: fk_book_comment
+                    references: comments(id)
+                    onDelete: CASCADE
+              - column:
+                  name: book_text_id
+                  type: BIGINT
+                  constraints:
+                    nullable: true
+                    foreignKeyName: fk_book_booktext
+                    references: books_text(id)
+                    onDelete: NULL
+              - column:
+                  name: bookmark_id
+                  type: BIGINT
+                  constraints:
+                    nullable: true
+                    foreignKeyName: fk_book_bookmarks
+                    references: bookmarks(id)
+                    onDelete: CASCADE
+  - changeSet:
+      id: 12
+      author: bev
+      comment: "Insert books table"
+      changes:
+        - insert:
+            tableName: books
+            columns:
+              - column:
+                  name: title
+                  value: "Война и Мир"
+              - column:
+                  name: author_id
+                  value: 1
+              - column:
+                  name: genre_id
+                  value: 1
+        - insert:
+            tableName: books
+            columns:
+              - column:
+                  name: title
+                  value: "Капитанская дочка"
+              - column:
+                  name: author_id
+                  value: 2
+              - column:
+                  name: genre_id
+                  value: 2
+        - insert:
+            tableName: books
+            columns:
+              - column:
+                  name: title
+                  value: "Пиковая дама"
+              - column:
+                  name: author_id
+                  value: 2
+              - column:
+                  name: genre_id
+                  value: 2
+        - insert:
+            tableName: books
+            columns:
+              - column:
+                  name: title
+                  value: "Метель"
+              - column:
+                  name: author_id
+                  value: 2
+              - column:
+                  name: genre_id
+                  value: 2
+        - insert:
+            tableName: books
+            columns:
+              - column:
+                  name: title
+                  value: "Гроза"
+              - column:
+                  name: author_id
+                  value: 3
+              - column:
+                  name: genre_id
+                  value: 3
+        - insert:
+            tableName: books
+            columns:
+              - column:
+                  name: title
+                  value: "Бесприданница"
+              - column:
+                  name: author_id
+                  value: 3
+              - column:
+                  name: genre_id
+                  value: 3
+  - changeSet:
+      id: 14
+      author: bev
+      comment: "Insert bookmarks table"
+      changes:
+        - insert:
+            tableName: bookmarks
+            columns:
+              - column:
+                  name: username
+                  value: "madjo"
+              - column:
+                  name: book_id
+                  value: 1
+              - column:
+                  name: part_num
+                  value: 1
+              - column:
+                  name: cur_page
+                  value: 1
+        - insert:
+            tableName: bookmarks
+            columns:
+              - column:
+                  name: username
+                  value: "admin"
+              - column:
+                  name: book_id
+                  value: 1
+              - column:
+                  name: part_num
+                  value: 5
+              - column:
+                  name: cur_page
+                  value: 7
+        - insert:
+            tableName: bookmarks
+            columns:
+              - column:
+                  name: username
+                  value: "admin"
+              - column:
+                  name: book_id
+                  value: 2
+              - column:
+                  name: part_num
+                  value: 12
+              - column:
+                  name: cur_page
+                  value: 32
+        - insert:
+            tableName: bookmarks
+            columns:
+              - column:
+                  name: username
+                  value: "madjo"
+              - column:
+                  name: book_id
+                  value: 2
+              - column:
+                  name: part_num
+                  value: 12
+              - column:
+                  name: cur_page
+                  value: 32
