@@ -25,7 +25,6 @@
         var curPage = -1;
         var pageText = []
         var partNum = 1;
-        var minPage = 0;
         var maxPage = 0;
         var maxPartNumber = 0;
         function getBookmark() {
@@ -53,7 +52,6 @@
             .then(rawResponse => rawResponse.json())
             .then(json => {
                 pageText = json.formattedTextSplitOnPages
-                minPage = json.minPage;
                 maxPage = json.maxPage - 1;
                 maxPartNumber = json.maxPartNumber;
                 document.querySelector('#max-part').textContent = json.maxPartNumber;
@@ -72,7 +70,6 @@
             .then(json => {
                 console.log(json)
                 pageText = json.formattedTextSplitOnPages
-                minPage = json.minPage;
                 maxPage = json.maxPage - 1;
                 curPage = json.maxPage - 1;
                 maxPartNumber = json.maxPartNumber;

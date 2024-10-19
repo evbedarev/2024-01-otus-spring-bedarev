@@ -26,10 +26,6 @@ public class TextBookDto {
 
     @Getter
     @Setter
-    private int minPage;
-
-    @Getter
-    @Setter
     private int maxPage;
 
     @Getter
@@ -57,7 +53,6 @@ public class TextBookDto {
         TextBookDto textBookDto = new TextBookDto(Arrays.asList("null"),
                 bookText.getPartNumber(),
                 bookText.getMaxPartNumber(),
-                bookText.getMinPage(),
                 bookText.getMaxPage(),
                 bookText.getBook().getId(),
                 pages);

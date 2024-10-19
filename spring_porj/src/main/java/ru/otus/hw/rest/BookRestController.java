@@ -18,7 +18,6 @@ import ru.otus.hw.dto.book.*;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.services.BookService;
-import ru.otus.hw.services.BookTextService;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,11 +27,9 @@ import java.util.stream.Collectors;
 public class BookRestController {
     private final BookService bookService;
 
-    private final BookTextService bookTextService;
 
-    public BookRestController(BookService bookService, BookTextService bookTextService) {
+    public BookRestController(BookService bookService) {
         this.bookService = bookService;
-        this.bookTextService = bookTextService;
     }
 
     @GetMapping("/api/v1/books")
@@ -73,7 +70,11 @@ public class BookRestController {
     }
 
     @PostMapping("/api/v1/books")
-    public BookDto createNewBook(@RequestBody BookModifyDto bookModifyDto) {
+    public BookDto createNewBook(@Valid @RequestBody BookModifyDto bookModifyDto,
+                                 BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return createErrorDto(bindingResult);
+        }
         Book book = bookService.insert(bookModifyDto.getTitle(),
                 bookModifyDto.getAuthorId(),
                 bookModifyDto.getGenreId());
@@ -82,7 +83,8 @@ public class BookRestController {
 
 
     @PatchMapping("/api/v1/books")
-    public BookDto updateBookById(@Valid @RequestBody BookModifyDto bookModifyDto, BindingResult bindingResult) {
+    public BookDto updateBookById(@Valid @RequestBody BookModifyDto bookModifyDto,
+                                  BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return createErrorDto(bindingResult);
         }
@@ -110,26 +112,6 @@ public class BookRestController {
         if (ex.getMessage().contains("Genre")) {
             bindingResult.addError(new FieldError("book", "genreId", "Genre with id not found"));
         }
-    }
-
-    @PostMapping("/api/v1/books/text")
-    public String addTextForBook(@RequestBody TextBookDto textBookDto) {
-        System.out.println("part num %s".formatted(textBookDto.getPartNumber()));
-        bookTextService.insertText(textBookDto.getUnformatedText(),
-                textBookDto.getPartNumber(),
-                textBookDto.getBookId());
-        return "ok";
-    }
-
-    @GetMapping("/api/v1/books/text/{id}")
-    public TextBookDto getBookText(@PathVariable("id") long id) {
-        return bookTextService.findByBookId(id);
-    }
-
-    @GetMapping("/api/v1/books/text/{bookid}/{part}")
-    public TextBookDto getBookTextByBookIdAndPartNum(@PathVariable("bookid") long bookid,
-                                                     @PathVariable("part") int part) {
-        return bookTextService.findByBookIdAndPartNumber(bookid, part);
     }
 
     private List<String> getAllErrorsFromResult(BindingResult bindingResult) {

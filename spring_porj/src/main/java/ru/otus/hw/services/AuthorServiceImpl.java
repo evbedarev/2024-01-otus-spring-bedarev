@@ -69,7 +69,6 @@ public class AuthorServiceImpl implements AuthorService {
         if (!optionalAuthor.isPresent()) {
             throw new EntityNotFoundException("Author with id %s not found".formatted(id));
         }
-        checkAuthorExistByFullName(fullName);
         logger.info("Update author with id: %d".formatted(id));
         return authorRepository.save(new Author(id, fullName, aboutAuthor));
     }

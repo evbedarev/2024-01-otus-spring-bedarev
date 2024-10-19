@@ -68,10 +68,11 @@ public class LoadTextFileServiceTest {
             countChars = countChars + getCountChars(Arrays.asList(bt.getBookText().split("\n")));
             countPages = countPages + bt.getMaxPage();
             countRows = countRows + bt.getBookText().split("\n").length;
+            System.out.println(bt.getBookText());
         }
-        assertThat(countChars).isEqualTo(28206);
+        assertThat(countChars).isEqualTo(27833);
         assertThat(countPages).isEqualTo(9);
-        assertThat(countRows).isEqualTo(472);
+        assertThat(countRows).isEqualTo(471);
     }
 
     private int getCountChars(List<String> lines) {

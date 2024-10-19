@@ -32,11 +32,6 @@ public class BookText {
     @Getter
     @Setter
     @Column
-    private int minPage;
-
-    @Getter
-    @Setter
-    @Column
     private int maxPage;
 
     @Getter

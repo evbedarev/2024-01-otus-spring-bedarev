@@ -469,3 +469,11 @@ databaseChangeLog:
               - column:
                   name: genre_id
                   value: 3
+  - changeSet:
+      id:  dropColumn-minPage-from-books-text
+      author:  bev
+      changes:
+        - dropColumn:
+            columnName: min_page
+            schemaName: public
+            tableName: books_text

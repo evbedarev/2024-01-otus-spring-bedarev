@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
 
-@DisplayName("Тест сервиса закладок")
+@DisplayName("Тест репозитория закладок")
 @DataJpaTest
 public class BookmarkRepositoryTest {
 
