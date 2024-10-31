@@ -25,4 +25,12 @@ public class Genre {
     @Column(name = "name",nullable = false, unique = true)
     @Getter
     private String name;
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Genre extGenre = (Genre) obj;
+        return ((id == extGenre.id) && (name.equals(((Genre) obj).getName())));
+    }
 }

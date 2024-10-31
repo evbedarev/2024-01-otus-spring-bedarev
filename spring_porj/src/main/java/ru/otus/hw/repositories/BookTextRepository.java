@@ -27,4 +27,11 @@ public interface BookTextRepository  extends JpaRepository<BookText, Long> {
 
     @Query("SELECT MAX(b.partNumber) FROM BookText b where b.book.id = :book_id")
     int findMaxPartNumberByBookId(@Param("book_id") long bookId);
+
+    //@Query("SELECT b.minPage FROM BookText b where b.book.id = :book_id and b.partNumber = :partNum")
+    //int getMinPageByBookIdAndPartNum(@Param("book_id")long bookId, @Param("partNum") int partNum);
+
+    //@Query("SELECT b.maxPage FROM BookText b where b.book.id = :book_id and b.partNumber = :partNum")
+    //int getMaxPageByBookIdAndPartNum(@Param("book_id")long bookId, @Param("partNum") int partNum);
+
 }

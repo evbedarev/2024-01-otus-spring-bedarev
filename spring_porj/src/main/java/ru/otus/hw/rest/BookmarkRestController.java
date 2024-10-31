@@ -16,7 +16,7 @@ public class BookmarkRestController {
     private final BookmarksService bookmarksService;
 
     @PostMapping("/api/v1/bookmarks")
-    public BookmarkDto insertBookmark(@RequestBody BookmarkDto bookmarkDto) {
+    public BookmarkDto createBookmark(@RequestBody BookmarkDto bookmarkDto) {
         try {
             Bookmark bookmark = bookmarksService.insertBookmark(bookmarkDto.getBookId(),
                     bookmarkDto.getCurPage(),

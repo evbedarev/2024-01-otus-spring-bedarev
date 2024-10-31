@@ -1,3 +1,5 @@
+db:
+  schema: public
 spring:
   test:
     database:

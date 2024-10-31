@@ -30,15 +30,6 @@ public class TextBookRestController {
         this.loadFile = loadFile;
     }
 
-    @PostMapping("/api/v1/text")
-    public String addTextForBook(@RequestBody TextBookDto textBookDto) {
-        System.out.println("part num %s".formatted(textBookDto.getPartNumber()));
-        bookTextService.insertText(textBookDto.getUnformatedText(),
-                textBookDto.getPartNumber(),
-                textBookDto.getBookId());
-        return "ok";
-    }
-
     @GetMapping("/api/v1/text/{id}")
     public TextBookDto getBookText(@PathVariable("id") long id) {
         return bookTextService.findByBookId(id);
@@ -48,11 +39,6 @@ public class TextBookRestController {
     public TextBookDto getBookTextByBookIdAndPartNum(@PathVariable("bookid") long bookid,
                                                      @PathVariable("part") int part) {
         return bookTextService.findByBookIdAndPartNumber(bookid, part);
-    }
-
-    @PostMapping("/api/v1/pages/{bookId}")
-    public void setPagesOnBook(@PathVariable("bookId") long bookId) {
-        bookTextService.setPagesOnBook(bookId);
     }
 
     @DeleteMapping("/api/v1/text/{bookId}")

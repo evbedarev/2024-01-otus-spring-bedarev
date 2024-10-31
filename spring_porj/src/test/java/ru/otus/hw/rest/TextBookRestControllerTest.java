@@ -17,7 +17,6 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 
@@ -46,18 +45,6 @@ public class TextBookRestControllerTest {
     @MockBean
     private BookTextService bookTextService;
 
-    @Test
-    public void shouldCallBookTextServiceWithArgsWhenPostTextRest() throws Exception {
-        TextBookDto textBookDto = getTextDto();
-        String requestContent = objectMapper.writeValueAsString(textBookDto);
-        mockMvc.perform(post("/api/v1/text")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestContent))
-                .andExpect(status().isOk());
-        verify(bookTextService, times(1)).insertText(textBookDto.getUnformatedText(),
-                textBookDto.getPartNumber(),
-                textBookDto.getBookId());
-    }
 
     @Test
     public void shouldReturnCorrectTextBookDtoWherCallGetTextApi() throws Exception {
@@ -79,12 +66,12 @@ public class TextBookRestControllerTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(textBookDto)));
     }
 
-    @Test
-    public void shouldCallSetPagesInBookTextService() throws Exception {
-        mockMvc.perform(post("/api/v1/pages/1"))
-                .andExpect(status().isOk());
-        verify(bookTextService, times(1)).setPagesOnBook(1L);
-    }
+    //@Test
+    //public void shouldCallSetPagesInBookTextService() throws Exception {
+    //    mockMvc.perform(post("/api/v1/pages/1"))
+    //            .andExpect(status().isOk());
+    //    verify(bookTextService, times(1)).setPagesOnBook(1L);
+    //}
 
     @Test
     public void shouldCallRemoveBookTextMethodInBookTextService() throws Exception {

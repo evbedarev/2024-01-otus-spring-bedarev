@@ -1,6 +1,5 @@
 package ru.otus.hw.rest;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +10,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.validation.BindingResult;
 import ru.otus.hw.dto.author.AuthorDto;
 import ru.otus.hw.dto.book.BookDto;
 import ru.otus.hw.dto.book.BookErrorDto;
@@ -26,18 +24,15 @@ import ru.otus.hw.services.BookService;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @WebMvcTest({BookRestController.class, SecurityConfiguration.class})
 public class BookRestControllerTest {
 
-    private static final int PAGE_SIZE = 5;
-
-    private static final String SORTED_BY = "id";
-
+    private final static String TITLE_ERR_TEXT = "Title input more then 2 chars";
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -137,9 +132,46 @@ public class BookRestControllerTest {
         Book book = new Book(1L, "t", getBook(1).getAuthor(), getBook(1).getGenre());
         BookModifyDto bookModifyDto = BookModifyDto.toDto(book);
         String requestContent = objectMapper.writeValueAsString(bookModifyDto);
-        String expectedContent = objectMapper.writeValueAsString(createErrorDto("Title input more then 2 chars"));
+        String expectedContent = objectMapper.writeValueAsString(createErrorDto(TITLE_ERR_TEXT));
         checkPostResult("/api/v1/books", requestContent, expectedContent);
     }
+
+    @Test
+    public void shouldCorrectUpdateBookById() throws Exception {
+        Book book = getBook(1L);
+        Mockito.when(bookService.update(book.getId(), book.getTitle(),
+                book.getAuthor().getId(),
+                book.getGenre().getId())).thenReturn(book);
+        BookModifyDto bookModifyDto = BookModifyDto.toDto(book);
+        String requestContext = objectMapper.writeValueAsString(bookModifyDto);
+        mockMvc.perform(patch("/api/v1/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestContext))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(BookDto.toDt0(book))));
+    }
+
+    @Test
+    public void shouldReturnErrorDtoWhenUpdateBookById() throws Exception {
+        Book book = new Book(1L, "t", getBook(1).getAuthor(), getBook(1).getGenre());
+        BookModifyDto bookModifyDto = BookModifyDto.toDto(book);
+        String requestContext = objectMapper.writeValueAsString(bookModifyDto);
+        String expectedContent = objectMapper.writeValueAsString(createErrorDto(TITLE_ERR_TEXT));
+        mockMvc.perform(patch("/api/v1/books")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestContext))
+                .andExpect(status().isOk())
+                .andExpect(content().json(expectedContent));
+    }
+
+    @Test
+    public void shouldCorrectDeleteBookById() throws Exception {
+        mockMvc.perform(delete("/api/v1/books/1"))
+                .andExpect(status().isOk());
+        Mockito.verify(bookService,Mockito.times(1)).deleteById(1L);
+    }
+
+
 
 
     private List<Book> getListBooks() {

@@ -30,9 +30,6 @@ spring:
     encoding:
       charset: UTF-8
     enabled: true
-  h2:
-    console:
-      enabled: true
   mvc:
     hiddenmethod:
       filter:
@@ -47,3 +44,5 @@ spring:
   jpa:
     database: postgresql
     show-sql: true
+db:
+  schema: public

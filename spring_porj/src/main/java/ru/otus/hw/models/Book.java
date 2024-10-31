@@ -39,4 +39,20 @@ public class Book {
     @Getter
     private Genre genre;
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Book bookObj = (Book) obj;
+        StringBuilder thisStringBuilder = new StringBuilder();
+        StringBuilder extStringBuilder = new StringBuilder();
+        thisStringBuilder.append(id).append(title).append(author.getId())
+                .append(author.getFullName()).append(author.getAboutAuthor())
+                .append(genre.getId()).append(genre.getName());
+        extStringBuilder.append(bookObj.id).append(bookObj.title).append(bookObj.author.getId())
+                .append(bookObj.author.getFullName()).append(bookObj.author.getAboutAuthor())
+                .append(bookObj.genre.getId()).append(bookObj.genre.getName());
+        return  extStringBuilder.equals(thisStringBuilder);
+    }
+
 }
