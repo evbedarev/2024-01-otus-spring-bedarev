@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Login page</title>
+    <style type="text/css">
+        .row {
+            margin-top: 10px;
+        }
+        .c-button {
+            appearance: none;
+            border: 0;
+            border-radius: 10px;
+            background: #4676D7;
+            color: #fff;
+            padding: 8px 16px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align:center">Login</h1>
+    <div th:if="${error}">
+       Unable to login. Check username and password.
+    </div>
+    <p style="text-align:center">New here? Click: <a th:href="@{/register}">here</a> to register.</p>
+    <form style="text-align:center" method="POST" th:action="@{/login}" id="loginForm">
+        <div class="row">
+            <label for="username">Username: </label>
+            <input type="text" name="username" id="username"/><br/>
+        </div>
+
+        <div class="row">
+            <label for="password">Password: </label>
+            <input type="password" name="password" id="password"/><br/>
+        </div>
+
+        <div class="row">
+            <input class="c-button" type="submit" value="Login"/>
+        </div>
+    </form>
+</body>
+</html>

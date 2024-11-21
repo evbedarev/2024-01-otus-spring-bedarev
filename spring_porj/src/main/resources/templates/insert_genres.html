@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Insert genre</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        label {
+            display: inline-block;
+            width: 100px;
+        }
+
+        input:read-only {
+            background: lightgray;
+        }
+
+        .row {
+            margin-top: 10px;
+        }
+        .file-picker {}
+    </style>
+    <script>
+        function insertGenre() {
+            const errFnContainer = document.getElementById("err-name-input")
+            const nameInput = document.getElementById("name-input")
+
+            const genre = { name: nameInput.value }
+            fetch("/api/v1/genres",{
+                method: 'POST',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(genre)})
+            .then(rawResponse => rawResponse.json())
+            .then(json =>
+                  {
+                      if (JSON.stringify(json.hasError, null, 4) == "true") {
+                          console.log(json)
+                          document.getElementById('err-name-input').style='display:block;';
+                          document.querySelector('#err-name-input').textContent =
+                                 JSON.stringify(json.errText, null, 4);
+                      } else {
+                          document.getElementById('err-name-input').style='display:none;';
+                      }
+                  }
+            )
+        }
+    </script>
+<body>
+    <h3>Add new Genre</h3>
+    <div class="row">
+        <label for="name-input">Name Genre:</label>
+        <input size="100" id="name-input" name="name" value=""/>
+        <p id="err-name-input"></p>
+    </div>
+    <div class="row">
+        <button type="button" onclick="insertGenre()">Save</button>
+        <a href="list.html" th:href="@{/genre}"><button type="button">Back</button></a>
+    </div>
+
+</body>
+</html>

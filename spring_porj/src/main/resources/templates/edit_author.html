@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Edit author</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        label {
+            display: inline-block;
+            width: 100px;
+        }
+
+        input:read-only {
+            background: lightgray;
+        }
+
+        .row {
+            margin-top: 10px;
+        }
+    </style>
+    <script>
+        function editAuthor() {
+            const errFnContainer = document.getElementById("err-full-name-input")
+
+            const fullNameInput = document.getElementById("full-name-input")
+            const IdInput = document.getElementById("id-input")
+            const aboutAuthorInput = document.getElementById("about-author-input")
+            const author = { id: IdInput.value,
+                             fullName: fullNameInput.value,
+                             aboutAuthor: aboutAuthorInput.value
+                           }
+            fetch("/api/v1/authors",{
+                method: 'PATCH',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(author)})
+            .then(rawResponse => rawResponse.json())
+            .then(json =>
+                  {
+                      if (JSON.stringify(json.authorErrorDto.hasErrors, null, 4) == "true") {
+                          document.getElementById('err-full-name').style='display:block;';
+                          document.querySelector('#err-full-name').textContent =
+                                 JSON.stringify(json.authorErrorDto.fullNameError, null, 4);
+                      } else {
+                          document.getElementById('err-full-name').style='display:none;';
+                      }
+                  }
+            )
+        }
+    </script>
+</head>
+<body>
+
+<!-- Book edition -->
+<form id="edit-form" action="edit_author.html"  th:object="${authorDto}">
+    <h3>Author Edit:</h3>
+
+    <div class="row">
+        <label for="id-input">ID:</label>
+        <input id="id-input" type="text" readonly="readonly" th:value="*{id}" value="default"/>
+    </div>
+
+    <div class="row">
+        <label for="full-name-input">Full Name:</label>
+        <input  size="100" id="full-name-input" name="fullName" type="text" th:value="*{fullName}" value="default"/>
+        <pre id = "err-full-name"></pre>
+    </div>
+
+
+    <div class="row">
+        <label for="about-author-input">About Author:</label>
+        <input size="100" id="about-author-input" name="fullName" type="text" th:value="*{aboutAuthor}" value="default"/>
+        <pre id = "err-about-author"></pre>
+    </div>
+
+    <div class="row">
+        <button type="button" onclick="editAuthor()" >Save</button>
+        <a href="list.html" th:href="@{/author}"><button type="button">Cancel</button></a>
+    </div>
+</form>
+
+</body>
+</html>

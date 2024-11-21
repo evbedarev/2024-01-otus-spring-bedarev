@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration</title>
+    <style type="text/css">
+        .row {
+            margin-top: 10px;
+        }
+    </style>
+    <script>
+        function insertNewUser() {
+            const errFnContainer = document.getElementById("err-full-name-input")
+            const userNameInput = document.getElementById("username")
+            const passwordInput = document.getElementById("password")
+
+            const user = { username: username.value,
+                             password: password.value
+                           }
+            fetch("/api/v1/user",{
+                method: 'POST',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(user)})
+            .then(rawResponse => rawResponse.json())
+            .then(json =>
+                  {
+                      console.log(JSON.stringify(json, null, 4))
+                      if (JSON.stringify(json.hasError, null, 4) == "true") {
+                          if (json.errorUser != "") {
+                            document.getElementById('error-user').style='display:block;';
+                            document.querySelector('#error-user').textContent =
+                                 JSON.stringify(json.errorUser, null, 4);
+                          } else {
+                            document.getElementById('error-user').style='display:none;';
+                          }
+                          if (json.errorPass != "") {
+                            document.getElementById('error-pass').style='display:block;';
+                            document.querySelector('#error-pass').textContent =
+                                   JSON.stringify(json.errorPass, null, 4);
+                          } else {
+                            document.getElementById('error-pass').style='display:none;';
+                          }
+                      } else {
+                          document.getElementById('error-user').style='display:none;';
+                          document.getElementById('error-pass').style='display:none;';
+                      }
+                  }
+            )
+        }
+    </script>
+</head>
+<body>
+    <h1>Register</h1>
+    <form>
+        <div class="row">
+        <label for="username">Username: </label>
+        <input type="text" name="username" id="username"/>
+        </div>
+        <div class="row">
+        <label for="password">Password: </label>
+        <input type="password" name="password" id="password"/>
+        </div>
+        <div class="row">
+            <pre id = "error-user"></pre>
+        </div>
+        <div class="row">
+            <pre id = "error-pass"></pre>
+        </div>
+        <div class="row">
+            <button type="button" onclick="insertNewUser()">Register</button>
+            <a href="list.html" th:href="@{/login}"><button type="button">cancel</button></a>
+        </div>
+    </form>
+</body>
+</html>

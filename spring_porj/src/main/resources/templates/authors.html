@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8"/>
+    <title>List of all authors</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        .authors {
+            border: 1px solid steelblue;
+            width: 1200px;
+            border-collapse: collapse;
+        }
+
+        .authors tr td, th {
+            padding: 5px;
+            border: 1px solid steelblue;
+        }
+
+        .authors td:last-child, td:first-child {
+            width: 200px;
+        }
+
+        .row {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body >
+<h3>Authors: </h3>
+<script>
+    function findAuthorByFullName() {
+        const authorContainer = document.getElementById("data-author-table")
+        var tableContent = ``
+        const authorFullName = document.getElementById("find-author-input")
+        const author = { id: '1', fullName: authorFullName.value, aboutAuthor: ''}
+        fetch("/api/v1/authors/find",{
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(author)})
+        .then(rawResponse => rawResponse.json())
+        .then(json =>
+            {
+                authorContainer.innerHTML = `<thead><tr><th style="width:3%">ID</th><th style="width:30%">Full Name</th><th style="width:67%">About author</th><th></th></tr></thead>`;
+                tableContent = `<tr>`;
+                tableContent += `<td>` + json.id + `</td>`;
+                tableContent += `<td>` + json.fullName + `</td>`;
+                tableContent += `<td>` + json.aboutAuthor + `</td>`;
+                tableContent += `<td><a href="/author/edit/` + json.id + `">Edit</a>` + `</td>`;
+                tableContent += `<td><a href="/author/delete/` + json.id + `">Delete</a>` + `</td>`;
+                tableContent += `</tr>`;
+                authorContainer.innerHTML += tableContent;
+            })
+    };
+</script>
+<form id="find-author-form" action="authors.html">
+
+    <div class="row">
+        <label for="find-author-input">Find Author by full name:</label>
+        <input id="find-author-input" name="author" type="text" value=""/>
+        <button type="button" onclick="findAuthorByFullName()">Find</button>
+    </div>
+
+    <div class="row">
+        <a href="list.html" th:href="@{/author/insert}"><button type="button">Insert new author</button></a>
+    </div>
+
+    <div class="row"></div>
+</form>
+
+<table class="authors" id="data-author-table">
+    <thead>
+    <tr>
+        <th style="width:3%">ID</th>
+        <th style="width:30%">Full Name</th>
+        <th style="width:67%">About author</th>
+        <th></th>
+    </tr>
+    </thead>
+</table>
+<script>
+    function getAuthors() {
+        const authorContainer = document.getElementById("data-author-table")
+        authorContainer.innerHTML = `<thead><tr><th style="width:3%">ID</th>` +
+        `<th style="width:30%">Full Name</th><th style="width:67%">About author</th><th></th></tr></thead>`;
+        var tableContent = ``
+        fetch("api/v1/authors", {method: 'GET'})
+        .then(rawResponse => rawResponse.json())
+        .then(json => json.forEach(a => {
+            tableContent = `<tr>`;
+            tableContent += `<td>` + a.id + `</td>`;
+            tableContent += `<td>` + a.fullName + `</td>`;
+            tableContent += `<td>` + a.aboutAuthor + `</td>`;
+            tableContent += `<td><a href="/author/edit/` + a.id + `">Edit</a>` + `</td>`;
+            tableContent += `<td><a href="/author/delete/` + a.id + `">Delete</a>` + `</td>`;
+            tableContent += `</tr>`;
+            authorContainer.innerHTML += tableContent;}))
+    };
+    window.onload = getAuthors;
+</script>
+<div class="row" >
+    <a href="books.html" th:href="@{/admin}"><button type="button">Back</button></a>
+    <a href="books.html" th:href="@{/author}"><button type="button">show all authors</button></a>
+</div>
+</body>
+</html>
